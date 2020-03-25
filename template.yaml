@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple Rekommend web service for retrieving questions and resources
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+Resources:
+  Table:
+    Type: AWS::Serverless::SimpleTable
+    TableName:
+      Fn::Join:
+      - ''
+      - [Ref: Stage, -rekommend]
+
+  RekommendApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'authorization'"
+        AllowOrigin: "'*'"
+      OpenApiVersion: '2.0'
+
+  Journeys:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.journeys
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        AddJourney:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys
+            Method: post
+        ListJourneys:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys
+            Method: get
+        Journey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys/{journeyid}
+            Method: any
+        Terms:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys/terms
+            Method: any
+
+  Terms:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.terms
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        Terms:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /terms
+            Method: any
+
+  Resources:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.resources
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        AddResource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resources
+            Method: post
+        ListResources:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resources
+            Method: get
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resources/{resourceid}
+            Method: any
+
+Outputs:
+  ApiURL:
+    Description: API endpoint URL
+    Value:
+      Fn::Sub: https://${RekommendApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
