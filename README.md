@@ -13,7 +13,7 @@ This project runs serverlessly making use of the [AWS Serverless Application Mod
 
 Run `aws cloudformation package --template-file template.yaml --s3-bucket {bucket} --output-template-file {output}.yaml`
 
-{bucket} - The name of your s3 bucket that you want to store your you src files in
+{bucket} - The name of an existing s3 bucket that you want to store your you src files in
 
 {output} - The name of the file output by the packaging function
 
