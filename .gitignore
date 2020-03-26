@@ -107,4 +107,4 @@ dist
 package-v*
 
 # toml config
-.toml
+*.toml
