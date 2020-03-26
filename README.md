@@ -33,4 +33,6 @@ Run `sam local start-api`
 
 *This project isn't currently configured to run locally and will return an error when the endpoint is called*
 
+## Endpoints
 
+Information about how to interact with endpoints can be found on [SwaggerHub](https://app.swaggerhub.com/apis/Watson6982/rekommend-api/0.1)
