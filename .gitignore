@@ -103,5 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
-#sam generated template
+# sam generated template
 package-v*
+
+# toml config
+.toml
