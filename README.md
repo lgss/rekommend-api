@@ -4,6 +4,8 @@ This project runs serverless making use of the [AWS Serverless Application Model
 
 ## Requirements
 
+* AWS account
+* Access to configure IAM permissions
 * AWS CLI
 * AWS SAM CLI
 
