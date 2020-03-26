@@ -27,4 +27,10 @@ Run `aws cloudformation deploy --template-file {output}.yaml --stack-name {stack
 
 {stack} - The name of the cloudformation stack
 
+## Running locally
+
+Run `sam local start-api`
+
+*This project isn't currently configured to run locally and will return an error when the endpoint is called*
+
 
