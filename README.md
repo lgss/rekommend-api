@@ -1,5 +1,7 @@
 # rekommend-api
 
+This project runs serverlessly making use of the [AWS Serverless Application Model (SAM)] (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
+
 ## Requirements
 
 * AWS CLI
