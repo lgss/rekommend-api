@@ -118,7 +118,7 @@ exports.journeys = (event, context, callback) => {
                 createdAt: new Date().toISOString(),
                 label: reqBody.label,
                 doc: JSON.stringify(reqBody.doc),
-                type: reqBody.type
+                type: "journey"
             };
             return simple_create(event,newItem,callback);
         // get a single journey or list of journeys
@@ -153,7 +153,7 @@ exports.terms = (event, context, callback) => {
                 createdAt: new Date().toISOString(),
                 label: reqBody.label,
                 doc: JSON.stringify(reqBody.doc),
-                type: reqBody.type
+                type: "terms"
             };
             return simple_create(event,newItem,callback);
         // get a single journey or list of journeys
@@ -175,6 +175,15 @@ exports.resources = (event, context, callback) => {
     switch (event.httpMethod) {
         // add a resources file
         case "POST":
+            let reqBody = JSON.parse(event.body);
+            let newItem = {
+                id: uuid(),
+                createdAt: new Date().toISOString(),
+                label: reqBody.label,
+                doc: JSON.stringify(reqBody.doc),
+                type: "resource"
+            };
+            return simple_create(event,newItem,callback);
         // get a single resources file or list of resources files
         case "GET":
             if(id){
@@ -182,15 +191,16 @@ exports.resources = (event, context, callback) => {
             } else {
                 return simple_scan(event, 'type', 'resource', callback);
             }
-        // update resources file
+        // update an existing journey
         case "PUT":
+            return simple_update(event, event.pathParameters.journeyid, callback);
         // delete a resources file
         case "DELETE":
             return simple_delete(event, 'RESOURCES_' + event.pathParameters.resourceid, callback);
         // http method not supported
         default:
             const message = "Unsupported HTTP method";
-            createResponse(message, null, callback);
+            callback(null, createResponse(500, message));
     }
     
 };
