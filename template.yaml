@@ -60,13 +60,6 @@ Resources:
               Ref: RekommendApi
             Path: /journeys/{journeyid}
             Method: any
-        Terms:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /journeys/terms
-            Method: any
 
   Terms:
     Type: AWS::Serverless::Function
