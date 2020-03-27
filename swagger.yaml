@@ -1,0 +1,281 @@
+openapi: 3.0.1
+info:
+  title: rekommend-api
+  description: administrate SCDIP data
+  version: '0.1'
+servers:
+  - url: 'https://aqvneinxel.execute-api.eu-west-2.amazonaws.com/dev'
+    description: Development
+  - url: 'https://aqvneinxel.execute-api.eu-west-2.amazonaws.com/'
+    description: Production (Not currently configured)
+paths:
+  /journeys/:
+    get:
+      summary: returns all journeys
+      description: returns all items where type is equal to journey
+      responses:
+        '200':
+          description: array of journey items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/item'
+        '500':
+          description: server error
+    post:
+      summary: creates a journey
+      description: creates a new journey item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newItem'
+      responses:
+        '201':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/item'
+        '500':
+          description: server error
+  /journeys/{id}:
+    get:
+      summary: returns a list of pages
+      description: returns the value of doc attribute for a journey item
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: string
+          required: true
+          description: journey identifier
+      responses:
+        '200':
+          description: journey.doc attribute
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/journey'
+        '404':
+          description: no items found for the identifier
+        '500':
+          description: server error
+    put:
+      summary: update a journey
+      description: updates a single journey item
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: string
+          required: true
+          description: journey identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateItem'
+      responses:
+        '200':
+          description: success
+    delete:
+      summary: delete a journey
+      description: deletes a single journey item
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: string
+          required: true
+          description: journey identifier
+      responses:
+        '200':
+          description: success
+  /terms/:
+    get:
+      summary: returns terms and conditions
+      description: returns terms and conditions in page format
+      responses:
+        '200':
+          description: terms item
+  /resources/:
+    get:
+      summary: returns resources
+      description: returns all items where type is equal to resource
+      responses:
+        '200':
+          description: array of resource items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/item'
+        '500':
+          description: server error
+    post:
+      summary: creates an resources item
+      description: creates a new resource item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newItem'
+      responses:
+        '201':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/item'
+        '500':
+          description: server error
+  /resources/{id}:
+    get:
+      summary: returns a list of resources
+      description: returns the value of doc attribute for a resource item
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: string
+          required: true
+          description: resource identifier
+      responses:
+        '200':
+          description: resource.doc attribute
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resource'
+        '404':
+          description: no items found for the identifier
+        '500':
+          description: server error
+    put:
+      summary: update a resource item
+      description: updates a single resource item
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: string
+          required: true
+          description: resource identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateItem'
+      responses:
+        '200':
+          description: success
+    delete:
+      summary: delete a resource item
+      description: deletes a single resource item
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: string
+          required: true
+          description: resource identifier
+      responses:
+        '200':
+          description: success
+                        
+components:
+  schemas:
+    newItem:
+      type: object
+      properties:
+        doc:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+    item:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        id:
+          type: string
+        doc:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+    updateItem:
+      type: array
+      items:
+        type: object
+        properties:
+          paramName:
+            type: string
+          paramValue:
+            type: string
+    resource:
+      type: object
+      properties:
+        name:
+          type: string
+        content:
+          type: string
+        includeTags:
+          type: array
+          items:
+              type: string
+        excludeTags:
+          type: array
+          items:
+            type: string
+    journey:
+      type: object
+      properties:
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    fieldType: 
+                      type: string
+                    name:
+                      type: string
+                    label:
+                      type: string
+                    choices:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          value:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: string
+                    includeTags:
+                      type: array
+                      items:
+                        type: string
+                    excludeTags:
+                      type: array
+                      items:
+                        type: string
