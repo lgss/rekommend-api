@@ -106,4 +106,5 @@ dist
 # sam generated template
 package-v*
 
+# sam build files
 .aws-sam
