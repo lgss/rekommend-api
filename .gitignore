@@ -106,5 +106,4 @@ dist
 # sam generated template
 package-v*
 
-# toml config
-*.toml
+.aws-sam
