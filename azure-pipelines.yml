@@ -1,0 +1,40 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+    npm run build
+  displayName: 'npm install and build'
+
+- script: sudo apt-get install -y awscli
+  displayName: Install AWS CLI
+
+- script: |
+    aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
+    aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY)
+  displayName: Configure access
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+
+- script: sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+  displayName: Install Brew
+
+- script: |
+    brew tap aws/tap
+    brew install aws-sam-cli
+  displayName: Install aws sam cli
