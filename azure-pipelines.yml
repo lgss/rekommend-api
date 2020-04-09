@@ -16,8 +16,9 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
+    cd ./src
     npm install
-    npm run build
+    cd ..
   displayName: 'npm install and build'
 
 - script: sudo apt-get install -y awscli
