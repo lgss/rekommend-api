@@ -15,12 +15,6 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: |
-    cd ./src
-    npm install
-    cd ..
-  displayName: 'npm install and build'
-
 - script: sudo apt-get install -y awscli
   displayName: install aws cli
 
@@ -40,5 +34,3 @@ steps:
     brew install aws-sam-cli
   displayName: install aws sam cli
 
-- script: sam deploy --guided
-  displayName: deploy stack
