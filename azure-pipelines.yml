@@ -21,20 +21,23 @@ steps:
   displayName: 'npm install and build'
 
 - script: sudo apt-get install -y awscli
-  displayName: Install AWS CLI
+  displayName: install aws cli
 
 - script: |
     aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
     aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY)
-  displayName: Configure access
+  displayName: configure access
   env:
     AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
     AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
 
 - script: sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-  displayName: Install Brew
+  displayName: install brew
 
 - script: |
     brew tap aws/tap
     brew install aws-sam-cli
-  displayName: Install aws sam cli
+  displayName: install aws sam cli
+
+- script: sam deploy --guided
+  displayName: deploy stack
