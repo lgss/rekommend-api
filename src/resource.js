@@ -16,7 +16,7 @@ exports.POST = (event, context, callback) => {
     let newItem = {
         id: uuid(),
         createdAt: new Date().toISOString(),
-        doc: event.body,
+        doc: JSON.parse(event.body),
         type: "resource"
     };
     return db.simple_create(event,newItem,callback);
@@ -27,5 +27,5 @@ exports.DELETE = (event, context, callback) => {
 }
 
 exports.PUT = (event, context, callback) => {
-    return db.simple_update(event, event.pathParameters.journeyid, callback);
+    return db.simple_update(event, event.pathParameters.resourceid, callback);
 }
