@@ -20,7 +20,7 @@ Resources:
         Ref: Stage
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        AllowHeaders: "'authorization'"
+        AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
