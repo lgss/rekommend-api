@@ -3,6 +3,7 @@ const Resource = require('./resource.js')
 const AWS = require('aws-sdk');
 const uuid = require('uuid/v4');
 const dynamo = new AWS.DynamoDB.DocumentClient();
+//const util = require('util');
 
 
 const tableName = process.env.TABLE_NAME;
@@ -171,17 +172,18 @@ exports.terms = (event, context, callback) => {
 };
 
 exports.resources = (event, context, callback) => {
-    let id = event.pathParameters ? event.pathParameters.resourceid : null;
+    //let id = event.pathParameters ? event.pathParameters.resourceid : null;
+    //console.log("event: ", util.inspect(event, { showHidden: false, depth: null }));
 
     switch (event.httpMethod) {
         // add a resources file
-        case "POST": return Resource.post(event, context, callback)
+        case "POST": return Resource.POST(event,context,callback)
         // get a single resources file or list of resources files
-        case "GET": return Resource.get(event, context, callback)
+        case "GET": return Resource.GET(event, context, callback)
         // update an existing journey
-        case "PUT": return Resource.put(event, context, callback)
+        case "PUT": return Resource.PUT(event, context, callback)
         // delete a resources file
-        case "DELETE": return Resource.delete(event, context, callback)
+        case "DELETE": return Resource.DELETE(event, context, callback)
         // http method not supported
         default:
             const message = "Unsupported HTTP method";
