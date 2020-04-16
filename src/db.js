@@ -10,7 +10,7 @@ exports.simple_create = (event, newItem, callback) => {
         TableName: tableName,
         Item: newItem
     }).promise().then(() => {
-        callback(null,createResponse(201,newItem));
+        callback(null,createResponse(201,JSON.stringify(newItem)));
     })
     .catch(err => callback(null, createResponse(err.statusCode, JSON.stringify(err))));
 }
@@ -32,7 +32,7 @@ exports.simple_get = (event, ident, callback) => {
             return;
         }
         console.log(`RETRIEVED ITEM SUCCESSFULLY WITH doc = ${data.Item.doc}`);
-        callback(null, createResponse(200, data.Item.doc));
+        callback(null, createResponse(200, JSON.stringify(data.Item.doc)));
     }).catch( (err) => { 
         console.log(`GET ITEM FAILED FOR doc = ${params.Key.id}, WITH ERROR: ${err}`);
         callback(null, createResponse(500, JSON.stringify(err)));
@@ -51,7 +51,7 @@ exports.simple_scan = (event, attribute, value, callback) => {
     let dbScan = (params) => { return dynamo.scan(params).promise() };
     
     dbScan(params).then( (data) => {
-        callback(null, createResponse(200, data.Items));
+        callback(null, createResponse(200, JSON.stringify(data.Items)));
     }).catch( (err) => { 
         console.log(`SIMPLE SCAN FAILED WITH ERROR: ${err}`);
         callback(null, createResponse(500, JSON.stringify(err)));
