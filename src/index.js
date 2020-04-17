@@ -1,10 +1,8 @@
 'use strict';
 const Resource = require('./resource.js')
+const Journey = require('./journey.js')
 const AWS = require('aws-sdk');
-const uuid = require('uuid/v4');
 const dynamo = new AWS.DynamoDB.DocumentClient();
-//const util = require('util');
-
 
 const tableName = process.env.TABLE_NAME;
 
@@ -18,30 +16,6 @@ function simple_create(event, newItem, callback) {
         callback(null,createResponse(201,JSON.stringify(newItem)));
     })
     .catch(err => callback(null, createResponse(err.statusCode, JSON.stringify(err))));
-}
-
-function simple_get(event, ident, callback) {
-
-    let params = {
-        TableName: tableName,
-        Key: {
-            id: ident
-        }
-    };
-    
-    let dbGet = (params) => { return dynamo.get(params).promise() };
-    
-    dbGet(params).then( (data) => {
-        if (!data.Item) {
-            callback(null, createResponse(404, `ITEM NOT FOUND FOR ${ident}`));
-            return;
-        }
-        console.log(`RETRIEVED ITEM SUCCESSFULLY WITH doc = ${data.Item.doc}`);
-        callback(null, createResponse(200, data.Item.doc));
-    }).catch( (err) => { 
-        console.log(`GET ITEM FAILED FOR doc = ${params.Key.id}, WITH ERROR: ${err}`);
-        callback(null, createResponse(500, JSON.stringify(err)));
-    });
 }
 
 function simple_scan(event, attribute, value, callback) {
@@ -61,22 +35,6 @@ function simple_scan(event, attribute, value, callback) {
         console.log(`SIMPLE SCAN FAILED WITH ERROR: ${err}`);
         callback(null, createResponse(500, JSON.stringify(err)));
     });
-}
-
-function simple_delete(event, ident, callback) {
-    
-    let params = {
-        TableName: tableName,
-        Key: {
-            id: ident
-        }
-    };
-
-    return dynamo.delete(params)
-        .promise()
-        .then(() => callback(null, createResponse(200, JSON.stringify({message: 'item deleted successful'}))))
-        .catch(err => callback(null, createResponse(err.statusCode, JSON.stringify(err))))
-
 }
 
 function simple_update(event, ident, callback) {
@@ -109,33 +67,15 @@ function simple_update(event, ident, callback) {
 }
 
 exports.journeys = (event, context, callback) => {
-    let id = event.pathParameters ? event.pathParameters.journeyid : null;
-
     switch (event.httpMethod) {
-        // add a journey
-        case "POST":
-            let reqBody = JSON.parse(event.body);
-            let newItem = {
-                id: uuid(),
-                createdAt: new Date().toISOString(),
-                label: reqBody.label,
-                doc: JSON.stringify(reqBody.doc),
-                type: "journey"
-            };
-            return simple_create(event,newItem,callback);
-        // get a single journey or list of journeys
-        case "GET":
-            if(id){
-                return simple_get(event, event.pathParameters.journeyid, callback);
-            } else {
-                return simple_scan(event, 'type', 'journey', callback);
-            }
+        // add a resources file
+        case "POST": return Journey.POST(event,context,callback)
+        // get a single resources file or list of resources files
+        case "GET": return Journey.GET(event, context, callback)
         // update an existing journey
-        case "PUT":
-            return simple_update(event, event.pathParameters.journeyid, callback);
-        // delete a journey
-        case "DELETE":
-            return simple_delete(event, event.pathParameters.journeyid, callback);
+        case "PUT": return Journey.PUT(event, context, callback)
+        // delete a resources file
+        case "DELETE": return Journey.DELETE(event, context, callback)
         // http method not supported
         default:
             const message = "Unsupported HTTP method";
@@ -172,9 +112,6 @@ exports.terms = (event, context, callback) => {
 };
 
 exports.resources = (event, context, callback) => {
-    //let id = event.pathParameters ? event.pathParameters.resourceid : null;
-    //console.log("event: ", util.inspect(event, { showHidden: false, depth: null }));
-
     switch (event.httpMethod) {
         // add a resources file
         case "POST": return Resource.POST(event,context,callback)
@@ -189,5 +126,4 @@ exports.resources = (event, context, callback) => {
             const message = "Unsupported HTTP method";
             callback(null, createResponse(500, message));
     }
-    
 };
