@@ -39,3 +39,6 @@ steps:
     /home/linuxbrew/.linuxbrew/bin/brew install aws-sam-cli
   displayName: install aws sam cli
 
+- script: sam deploy
+  displayName: deploy changes
+
