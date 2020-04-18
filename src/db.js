@@ -1,5 +1,4 @@
 const AWS = require('aws-sdk');
-//const uuid = require('uuid/v4');
 const dynamo = new AWS.DynamoDB.DocumentClient();
 const {createResponse} = require('./util');
 
