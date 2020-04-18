@@ -1,9 +1,10 @@
 const AWS = require('aws-sdk');
-const uuid = require('uuid/v4');
+//const uuid = require('uuid/v4');
 const dynamo = new AWS.DynamoDB.DocumentClient();
 const {createResponse} = require('./util');
 
 const tableName = process.env.TABLE_NAME;
+
 
 exports.simple_create = (event, newItem, callback) => {
     return dynamo.put({
@@ -33,6 +34,30 @@ exports.simple_get = (event, ident, callback) => {
         }
         console.log(`RETRIEVED ITEM SUCCESSFULLY WITH doc = ${data.Item.doc}`);
         callback(null, createResponse(200, JSON.stringify(data.Item.doc)));
+    }).catch( (err) => { 
+        console.log(`GET ITEM FAILED FOR doc = ${params.Key.id}, WITH ERROR: ${err}`);
+        callback(null, createResponse(500, JSON.stringify(err)));
+    });
+}
+
+exports.get_item = (id, callback, includeId = false) => {
+    let params = {
+        TableName: tableName,
+        Key: {
+            id: id
+        }
+    };
+    
+    let dbGet = (params) => { return dynamo.get(params).promise() };
+    
+    dbGet(params).then( (data) => {
+        if (!data.Item) {
+            callback(null, createResponse(404, `ITEM NOT FOUND FOR ${id}`));
+            return;
+        }
+        console.log(`RETRIEVED ITEM SUCCESSFULLY WITH data = ${data}`);
+        delete data.Item.id
+        callback(null, createResponse(200, JSON.stringify(data.Item)));
     }).catch( (err) => { 
         console.log(`GET ITEM FAILED FOR doc = ${params.Key.id}, WITH ERROR: ${err}`);
         callback(null, createResponse(500, JSON.stringify(err)));

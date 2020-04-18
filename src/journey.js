@@ -16,8 +16,7 @@ exports.POST = (event, context, callback) => {
         id: uuid(),
         createdAt: new Date().toISOString(),
         label: reqBody.label,
-        doc: JSON.stringify(reqBody.doc),
-        type: "journey"
+        doc: JSON.stringify(reqBody.doc)
     };
     return db.simple_create(event,newItem,callback);
 }
