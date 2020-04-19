@@ -24,6 +24,17 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
+  RekommendEditorApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'authorization,content-type'"
+        AllowOrigin: "'*'"
+      OpenApiVersion: '2.0'
+
   Journeys:
     Type: AWS::Serverless::Function
     Properties:
@@ -121,8 +132,59 @@ Resources:
             Path: /resources/{resourceid}
             Method: any
 
+  GetGeneralConfig:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadGeneral
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadGeneral:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /config/general
+            Method: get
+
+  SetGeneralConfig:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.setGeneral
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadGeneral:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /config/general
+            Method: put
+      
+
 Outputs:
   ApiURL:
-    Description: API endpoint URL
+    Description: Player API endpoint URL
     Value:
       Fn::Sub: https://${RekommendApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
+  EditorApiURL:
+    Description: Editor API endpoint URL
+    Value:
+      Fn::Sub: https://${RekommendEditorApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
