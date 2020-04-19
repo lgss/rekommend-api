@@ -35,7 +35,30 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
-  Journeys:
+  GetJourneys:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.journeys
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        ListJourneys:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys
+            Method: get
+
+  SetJourneys:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.journeys
@@ -54,25 +77,41 @@ Resources:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /journeys
             Method: post
-        ListJourneys:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /journeys
-            Method: get
         Journey:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /journeys/{journeyid}
             Method: any
 
-  Resources:
+  GetResources:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.resources
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        ListResources:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resources
+            Method: get
+
+  SetResources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.resources
@@ -91,21 +130,14 @@ Resources:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /resources
             Method: post
-        ListResources:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /resources
-            Method: get
         Resource:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /resources/{resourceid}
             Method: any
 
