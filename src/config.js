@@ -18,6 +18,7 @@ exports.setDisclaimer = (event, context, callback) => {
   const body = JSON.parse(event.body);
   db.simple_create(null, {
     id: "DISCLAIMER",
+    title: body.title,
     content: body.content,
   }, callback)
 }
@@ -30,6 +31,7 @@ exports.setPositiveOutcome = (event, context, callback) => {
   const body = JSON.parse(event.body);
   db.simple_create(null, {
     id: "POSITIVE",
+    title: body.title,
     content: body.content,
   }, callback)
 }
