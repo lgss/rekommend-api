@@ -19,7 +19,7 @@ Resources:
       StageName:
         Ref: Stage
       Cors:
-        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowMethods: "'GET'"
         AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
@@ -35,7 +35,30 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
-  Journeys:
+  GetJourneys:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.journeys
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        ListJourneys:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys
+            Method: get
+
+  SetJourneys:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.journeys
@@ -54,32 +77,25 @@ Resources:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /journeys
             Method: post
-        ListJourneys:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /journeys
-            Method: get
         Journey:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /journeys/{journeyid}
             Method: any
 
-  Terms:
+  GetResources:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.terms
+      Handler: index.resources
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
+      - DynamoDBReadPolicy:
           TableName:
             Ref: Table
       Environment:
@@ -87,15 +103,15 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        Terms:
+        ListResources:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendApi
-            Path: /terms
-            Method: any
+            Path: /resources
+            Method: get
 
-  Resources:
+  SetResources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.resources
@@ -114,21 +130,14 @@ Resources:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /resources
             Method: post
-        ListResources:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /resources
-            Method: get
         Resource:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /resources/{resourceid}
             Method: any
 
@@ -139,7 +148,7 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
+      - DynamoDBReadPolicy:
           TableName:
             Ref: Table
       Environment:
@@ -177,7 +186,98 @@ Resources:
               Ref: RekommendEditorApi
             Path: /config/general
             Method: put
-      
+
+  GetDisclaimer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadDisclaimer
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadDisclaimer:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /config/disclaimer
+            Method: get
+
+  SetDisclaimer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.setDisclaimer
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadDisclaimer:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /config/disclaimer
+            Method: put
+
+  GetPositiveOutcome:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadPositiveOutcome
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadPositiveOutcome:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /config/positive-outcome
+            Method: get
+
+  SetPositiveOutcome:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.setPositiveOutcome
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadPositiveOutcome:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /config/positive-outcome
+            Method: put
 
 Outputs:
   ApiURL:
