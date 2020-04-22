@@ -58,6 +58,29 @@ Resources:
             Path: /journeys
             Method: get
 
+  GetEditorJourneys:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.journeys
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        ListJourneys:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journeys
+            Method: get
+
   SetJourneys:
     Type: AWS::Serverless::Function
     Properties:
