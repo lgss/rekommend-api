@@ -22,7 +22,9 @@ exports.POST = (event, context, callback) => {
         id: uuidv4(),
         createdAt: new Date().toISOString(),
         label: reqBody.label,
-        doc: JSON.stringify(reqBody.doc)
+        doc: reqBody.doc,
+        parent: reqBody.parent,
+        type: "journey"
     };
     return db.simple_create(event,newItem,callback);
 }
