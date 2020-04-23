@@ -15,30 +15,19 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: sudo apt-get install -y awscli
-  displayName: install aws cli
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'AWS-LGSS'
+    regionName: 'eu-west-2'
+    awsCommand: 'aws cloudformation package --template-file template.yaml --s3-bucket $(S3_BUCKET) --output-template-file template-output.yaml'
 
-- script: |
-    aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
-    aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY)
-  displayName: configure access
-  env:
-    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+- task: CopyFiles@2
+  inputs:
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-- script: |
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-    test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-    test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-    test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-    echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
-  displayName: install brew
-
-- script: |
-    /home/linuxbrew/.linuxbrew/bin/brew tap aws/tap
-    /home/linuxbrew/.linuxbrew/bin/brew install aws-sam-cli
-  displayName: install aws sam cli
-
-- script: aws/tap/aws-sam-cli deploy
-  displayName: deploy changes
-
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'package-output'
+    publishLocation: 'Container'
