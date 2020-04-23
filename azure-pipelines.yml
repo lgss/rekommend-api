@@ -19,7 +19,7 @@ steps:
   inputs:
     awsCredentials: 'AWS-LGSS'
     regionName: 'eu-west-2'
-    awsCommand: 'aws cloudformation'
+    awsCommand: 'cloudformation'
     awsSubCommand: 'package'
     awsArguments: '--template-file template.yaml --s3-bucket $(S3_BUCKET) --output-template-file template-output.yaml'
 
