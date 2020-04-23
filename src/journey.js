@@ -23,6 +23,7 @@ exports.POST = (event, context, callback) => {
         createdAt: new Date().toISOString(),
         label: reqBody.label,
         doc: reqBody.doc,
+        parent: reqBody.parent,
         type: "journey"
     };
     return db.simple_create(event,newItem,callback);
