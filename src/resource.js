@@ -7,7 +7,7 @@ function uuidv4() {
     });
   }
 
-exports.GET = (event, context, callback) => {
+exports.get = (event, context, callback) => {
     //const message = "Hello!";
     //callback(null, createResponse(200, message));
     let id = event.pathParameters ? event.pathParameters.resourceid : null;
@@ -18,7 +18,7 @@ exports.GET = (event, context, callback) => {
     }
 }
 
-exports.POST = (event, context, callback) => {
+exports.create = (event, context, callback) => {
     let newItem = {
         id: uuidv4(),
         createdAt: new Date().toISOString(),
@@ -28,10 +28,10 @@ exports.POST = (event, context, callback) => {
     return db.simple_create(event,newItem,callback);
 }
 
-exports.DELETE = (event, context, callback) => {
+exports.delete = (event, context, callback) => {
     return db.simple_delete(event, event.pathParameters.resourceid, callback);
 }
 
-exports.PUT = (event, context, callback) => {
+exports.update = (event, context, callback) => {
     return db.simple_update(event, event.pathParameters.resourceid, callback);
 }
