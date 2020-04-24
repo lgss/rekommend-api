@@ -38,7 +38,7 @@ Resources:
   GetJourneys:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.journeys
+      Handler: journey.get
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -50,29 +50,27 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        ListJourneys:
+        FindPlayerJourney:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys/{journeyid}
+            Method: get
+        ListPlayerJourneys:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendApi
             Path: /journeys
             Method: get
-
-  GetEditorJourneys:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: index.journeys
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: Table
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: Table
-      Events:
+        FindJourney:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journeys/{journeyid}
+            Method: get
         ListJourneys:
           Type: Api
           Properties:
@@ -81,10 +79,10 @@ Resources:
             Path: /journeys
             Method: get
 
-  SetJourneys:
+  CreateJourney:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.journeys
+      Handler: journey.create
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -96,48 +94,41 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        AddJourney:
+        Journey:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendEditorApi
             Path: /journeys
             Method: post
+
+  UpdateJourney:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: journey.update
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
         Journey:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendEditorApi
             Path: /journeys/{journeyid}
-            Method: any
+            Method: put
 
-  GetResources:
+  DeleteJourneys:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.resources
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: Table
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: Table
-      Events:
-        ListResources:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /resources
-            Method: get
-
-  SetResources:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: index.resources
+      Handler: journey.delete
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -149,20 +140,126 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        AddResource:
+        Journey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journeys/{journeyid}
+            Method: delete
+
+  GetResources:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.get
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        FindPlayerResource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resource/{resourceid}
+            Method: get
+        ListPlayerResources:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resources
+            Method: get
+        FindResource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/{resourceid}
+            Method: get
+        ListResources:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendEditorApi
             Path: /resources
-            Method: post
+            Method: get
+
+  CreateResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.create
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
         Resource:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendEditorApi
             Path: /resources/{resourceid}
-            Method: any
+            Method: post
+
+  UpdateResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.update
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/{resourceid}
+            Method: put
+
+  DeleteResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.delete
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/{resourceid}
+            Method: delete
 
   GetGeneralConfig:
     Type: AWS::Serverless::Function
