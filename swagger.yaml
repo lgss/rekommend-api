@@ -4,10 +4,13 @@ info:
   description: administrate SCDIP data
   version: '0.1'
 servers:
-  - url: 'https://aqvneinxel.execute-api.eu-west-2.amazonaws.com/dev'
+servers:
+  - url: # provide development url
     description: Development
-  - url: 'https://aqvneinxel.execute-api.eu-west-2.amazonaws.com/'
-    description: Production (Not currently configured)
+  - url: # provide staging url
+    description: staging
+  - url: # provide production url
+    description: Production
 paths:
   /journeys/:
     get:
