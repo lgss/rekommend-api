@@ -35,22 +35,6 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
-  GetPlayerJourneys:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: journey.get
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: Table
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: Table
-      Events:
-
   GetJourneys:
     Type: AWS::Serverless::Function
     Properties:
