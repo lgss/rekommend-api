@@ -163,6 +163,13 @@ Resources:
               Ref: RekommendApi
             Path: /config/general
             Method: get
+        LoadEditorGeneral:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /config/general
+            Method: get
 
   SetGeneralConfig:
     Type: AWS::Serverless::Function
