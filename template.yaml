@@ -283,6 +283,13 @@ Resources:
               Ref: RekommendApi
             Path: /config/general
             Method: get
+        LoadEditorGeneral:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /config/general
+            Method: get
 
   SetGeneralConfig:
     Type: AWS::Serverless::Function
@@ -329,6 +336,13 @@ Resources:
               Ref: RekommendApi
             Path: /config/disclaimer
             Method: get
+        LoadEditorDisclaimer:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /config/disclaimer
+            Method: get
 
   SetDisclaimer:
     Type: AWS::Serverless::Function
@@ -373,6 +387,13 @@ Resources:
           Properties:
             RestApiId: 
               Ref: RekommendApi
+            Path: /config/positive-outcome
+            Method: get
+        LoadEditorPositiveOutcome:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
             Path: /config/positive-outcome
             Method: get
 
