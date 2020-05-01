@@ -15,6 +15,11 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: './src'
+
 - task: AWSCLI@1
   inputs:
     awsCredentials: 'AWS-LGSS'
