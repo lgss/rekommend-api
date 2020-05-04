@@ -2,37 +2,8 @@
 
 This project runs serverless making use of the [AWS Serverless Application Model (SAM)](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
 
-## Requirements
+Related projects to interface this service;
+* [techknow](https://github.com/lgss/techknow/) : this service acts as the player for users to complete an assessment and retrieve results based on their responses. 
+* [rekommend-manage](https://github.com/lgss/rekommend-manage/) : this services acts as the editor for users to administrate journeys, resources and themeing
 
-* AWS account
-* Access to configure IAM permissions
-* AWS CLI
-* AWS SAM CLI
-
-## Quick start
-
-**Packaging**
-
-Run `aws cloudformation package --template-file template.yaml --s3-bucket {bucket} --output-template-file {output}.yaml`
-
-{bucket} - The name of an existing s3 bucket that you want to store your you src files in
-
-{output} - The name of the file output by the packaging function
-
-**Deploying**
-
-Run `aws cloudformation deploy --template-file {output}.yaml --stack-name {stack} --capabilities CAPABILITY_IAM`
-
-{output} - The name of the file output by the packing command
-
-{stack} - The name of the cloudformation stack
-
-## Running locally
-
-Run `sam local start-api`
-
-*This project isn't currently configured to run locally and will return an error when the endpoint is called*
-
-## Endpoints
-
-Information about how to interact with endpoints can be found on [SwaggerHub](https://app.swaggerhub.com/apis/Watson6982/rekommend-api/0.1)
+More information about this service can be found in the [wiki](https://github.com/lgss/rekommend-editor-api/wiki/)
