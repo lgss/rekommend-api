@@ -35,6 +35,29 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
+  CompileJourney:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: journey.compile
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        CompileJourney:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journey
+            Method: post
+
   GetJourneys:
     Type: AWS::Serverless::Function
     Properties:
