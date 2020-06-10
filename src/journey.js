@@ -1,6 +1,9 @@
 const db = require('./db');
 const {v4: uuidv4 } = require('uuid')
 
+const tableName = process.env.TABLE_NAME;
+const {createResponse} = require('./util');
+
 exports.get = (event, context, callback) => {
     let id = event.pathParameters ? event.pathParameters.journeyid : null;
     if(id){
@@ -21,6 +24,35 @@ exports.create = (event, context, callback) => {
         type: "journey"
     };
     return db.simple_create(event,newItem,callback);
+}
+
+exports.compile = (event) => {
+    const reqBody = JSON.parse(event.body);
+
+    // The current DB structure is problematic for this, as a crafted
+    // request could be used to retrieve other records
+    let params = {
+        RequestItems: {
+            [tableName]: {
+                Keys: reqBody.journeys.map(x => {
+                    return {id: x }
+                }),
+                ProjectionExpression: "doc"
+            }
+        }
+    };
+    
+    return db.dynamo.batchGet(params).promise()
+      .then( (data) => {
+        const docs = data.Responses[tableName]
+        const pages = docs.map(x => x.doc.pages)
+        const fields = pages.reduce((a, b) => [...a, ...b])
+
+        return createResponse(200, JSON.stringify({"pages": fields}));
+    }).catch( (err) => { 
+        console.log(`SIMPLE SCAN FAILED WITH ERROR: ${err}`);
+        return createResponse(500, JSON.stringify(err));
+    });
 }
 
 exports.delete = (event, context, callback) => {
