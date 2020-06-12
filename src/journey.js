@@ -47,8 +47,11 @@ exports.compile = (event) => {
         const docs = data.Responses[tableName]
         const pages = docs.map(x => x.doc.pages)
         const fields = pages.reduce((a, b) => [...a, ...b])
-
-        return createResponse(200, JSON.stringify({"pages": fields}));
+        const distinct = (value, index, self) => {
+            return self.findIndex(x => x.title === value.title) === index 
+        }
+        const uniqueFields = fields.filter(distinct)
+        return createResponse(200, JSON.stringify({"pages": uniqueFields}));
     }).catch( (err) => { 
         console.log(`SIMPLE SCAN FAILED WITH ERROR: ${err}`);
         return createResponse(500, JSON.stringify(err));
