@@ -466,10 +466,10 @@ Resources:
             Path: /config/positive-outcome
             Method: put
 
-  GetUploadURL:
+  SetFileURL:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: file.getUploadURL
+      Handler: file.setFileURL
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -481,12 +481,35 @@ Resources:
           BUCKET_NAME:
             Ref: Bucket
       Events:
-        GetUploadURL:
+        SetFileURL:
           Type: Api
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /get-upload-url/{extension}
+            Path: /set-file-url/{extension}
+            Method: get
+
+  GetFileURL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.getFileURL
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3ReadPolicy:
+          BucketName:
+            Ref: Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: Bucket
+      Events:
+        GetFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /get-file-url/{filename}
             Method: get
 
 Outputs:
