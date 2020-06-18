@@ -46,3 +46,27 @@ exports.getFileURL = (event, context, callback) => {
     })
   })
 }
+
+exports.deleteFile = (event, context, callback) => {
+  const fn = event.pathParameters.filename
+  const s3Params = {
+    Bucket: bucketName,
+    Key:  fn
+  }
+  return new Promise((resolve, reject) => {
+    s3.deleteObject(s3Params, function(err, data) {
+      if (err) console.log(err, err.stack);
+      else {
+        resolve({
+          "statusCode": 200,
+          "isBase64Encoded": false,
+          "headers": { "Access-Control-Allow-Origin": "*" },
+          "body": JSON.stringify({
+            "outcome": "deleted",
+            "aws": data
+          })
+        });
+      }
+    });
+  });
+}

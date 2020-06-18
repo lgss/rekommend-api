@@ -512,6 +512,28 @@ Resources:
             Path: /get-file-url/{filename}
             Method: get
 
+  DeleteFile:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.deleteFile
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3CrudPolicy:
+          BucketName:
+            Ref: Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: Bucket
+      Events:
+        SetFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /delete-file/{filename}
+            Method: get
 Outputs:
   BucketName:
     Description: Name of the sample Amazon S3 bucket with CORS enabled.
