@@ -33,16 +33,13 @@ exports.getFileURL = (event, context, callback) => {
     Key:  fn,
     Expires: 1800,
   }
+
   return new Promise((resolve, reject) => {
-    let uploadURL = s3.getSignedUrl('getObject', s3Params)
+    let srcURL = s3.getSignedUrl('getObject', s3Params)
     resolve({
       "statusCode": 302,
       "isBase64Encoded": false,
-      "headers": { "Access-Control-Allow-Origin": "*" },
-      "body": JSON.stringify({
-        "uploadURL": uploadURL,
-        "filename": fn
-      })
+      "headers": { "Access-Control-Allow-Origin": "*", "Location":srcURL }
     })
   })
 }
