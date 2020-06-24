@@ -6,6 +6,29 @@ Parameters:
     Type: String
     Default: dev
 Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName:
+        Fn::Join:
+        - ''
+        - [Ref: Stage, -rekommend]
+      CorsConfiguration:
+        CorsRules:
+        - AllowedHeaders: ['*']
+          AllowedMethods: [GET]
+          AllowedOrigins: ['*']
+          ExposedHeaders: [Date]
+          Id: rekommendCORSGetRule
+          MaxAge: '3600'
+        - AllowedHeaders: ['*']
+          AllowedMethods: [PUT]
+          AllowedOrigins: ['*']
+          ExposedHeaders: [Date]
+          Id: rekommendCORSPutRule
+          MaxAge: '3600'
+  
   Table:
     Type: AWS::Serverless::SimpleTable
     TableName:
@@ -443,7 +466,78 @@ Resources:
             Path: /config/positive-outcome
             Method: put
 
+  SetFileURL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.setFileURL
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3WritePolicy:
+          BucketName:
+            Ref: Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: Bucket
+      Events:
+        SetFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /set-file-url/{extension}
+            Method: get
+
+  GetFileURL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.getFileURL
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3ReadPolicy:
+          BucketName:
+            Ref: Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: Bucket
+      Events:
+        GetFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /image/{filename}
+            Method: get
+
+  DeleteFile:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.deleteFile
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3CrudPolicy:
+          BucketName:
+            Ref: Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: Bucket
+      Events:
+        SetFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /delete-file/{filename}
+            Method: get
 Outputs:
+  BucketName:
+    Description: Name of the sample Amazon S3 bucket with CORS enabled.
+    Value: !Ref 'Bucket'
   ApiURL:
     Description: Player API endpoint URL
     Value:
