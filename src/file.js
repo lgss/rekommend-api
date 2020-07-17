@@ -6,7 +6,7 @@ const bucketName = process.env.BUCKET_NAME;
 
 exports.setFileURL = (event, context, callback) => {
         const actionId = uuidv4()
-        const fn = `${actionId}.${event['pathParameters']['extension']}`
+        const fn = `${actionId}.${event['pathParameters']['filename']}`
         const s3Params = {
           Bucket: bucketName,
           Key:  fn,

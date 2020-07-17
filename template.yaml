@@ -433,7 +433,7 @@ Resources:
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /file/{extension}
+            Path: /file/{filename}
             Method: post
 
   GetFileURL:
