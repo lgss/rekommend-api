@@ -486,8 +486,8 @@ Resources:
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /set-file-url/{extension}
-            Method: get
+            Path: /file/{extension}
+            Method: post
 
   GetFileURL:
     Type: AWS::Serverless::Function
@@ -532,8 +532,8 @@ Resources:
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /delete-file/{filename}
-            Method: get
+            Path: /file/{filename}
+            Method: delete
 Outputs:
   BucketName:
     Description: Name of the sample Amazon S3 bucket with CORS enabled.
