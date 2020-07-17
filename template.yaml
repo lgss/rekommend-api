@@ -307,40 +307,10 @@ Resources:
             Path: /resources/{resourceid}
             Method: delete
 
-  GetGeneralConfig:
+  SetContent:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: config.loadGeneral
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: Table
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: Table
-      Events:
-        LoadGeneral:
-          Type: Api
-          Properties:
-            RestApiId: 
-              Ref: RekommendApi
-            Path: /config/general
-            Method: get
-        LoadEditorGeneral:
-          Type: Api
-          Properties:
-            RestApiId: 
-              Ref: RekommendEditorApi
-            Path: /config/general
-            Method: get
-
-  SetGeneralConfig:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: config.setGeneral
+      Handler: config.setContent
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -352,18 +322,18 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        LoadGeneral:
+        SetContent:
           Type: Api
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /config/general
+            Path: /content/{contentId}
             Method: put
-
-  GetDisclaimer:
+          
+  GetContent:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: config.loadDisclaimer
+      Handler: config.loadContent
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -375,25 +345,25 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        LoadDisclaimer:
+        LoadContent:
           Type: Api
           Properties:
             RestApiId: 
               Ref: RekommendApi
-            Path: /config/disclaimer
+            Path: /content/{contentId}
             Method: get
-        LoadEditorDisclaimer:
+        LoadEditorContent:
           Type: Api
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /config/disclaimer
+            Path: /content/{contentId}
             Method: get
 
-  SetDisclaimer:
+  SetTheme:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: config.setDisclaimer
+      Handler: config.setTheme
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -405,18 +375,18 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        LoadDisclaimer:
+        SetTheme:
           Type: Api
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /config/disclaimer
+            Path: /theme
             Method: put
-
-  GetPositiveOutcome:
+                    
+  GetTheme:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: config.loadPositiveOutcome
+      Handler: config.loadTheme
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -428,43 +398,20 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        LoadPositiveOutcome:
+        LoadTheme:
           Type: Api
           Properties:
             RestApiId: 
               Ref: RekommendApi
-            Path: /config/positive-outcome
+            Path: /theme
             Method: get
-        LoadEditorPositiveOutcome:
+        LoadEditorTheme:
           Type: Api
           Properties:
             RestApiId: 
               Ref: RekommendEditorApi
-            Path: /config/positive-outcome
+            Path: /theme
             Method: get
-
-  SetPositiveOutcome:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: config.setPositiveOutcome
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: Table
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: Table
-      Events:
-        LoadPositiveOutcome:
-          Type: Api
-          Properties:
-            RestApiId: 
-              Ref: RekommendEditorApi
-            Path: /config/positive-outcome
-            Method: put
 
   SetFileURL:
     Type: AWS::Serverless::Function
