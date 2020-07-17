@@ -474,7 +474,7 @@ Resources:
           BUCKET_NAME:
             Ref: Bucket
       Events:
-        SetFileURL:
+        DeleteFileURL:
           Type: Api
           Properties:
             RestApiId: 
