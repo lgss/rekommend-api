@@ -112,3 +112,4 @@ package-v*
 ## sam local invoke events
 .events
 samconfig.toml
+env.json
