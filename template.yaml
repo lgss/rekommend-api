@@ -458,6 +458,13 @@ Resources:
               Ref: RekommendApi
             Path: /image/{filename}
             Method: get
+        GetFileURLEditor:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /image/{filename}
+            Method: get
 
   DeleteFile:
     Type: AWS::Serverless::Function
