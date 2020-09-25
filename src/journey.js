@@ -2,7 +2,7 @@ const db = require('./db');
 const {v4: uuidv4 } = require('uuid')
 
 const tableName = process.env.TABLE_NAME;
-const {createResponse} = require('./util');
+const { createResponse } = require('./util');
 
 exports.get = (event, context, callback) => {
     let id = event.pathParameters ? event.pathParameters.journeyid : null;
@@ -41,11 +41,30 @@ exports.compile = (event) => {
             }
         }
     };
+
+    const transitionPromise = () => {
+        let tparams = {
+            TableName: tableName,
+            Key: {
+                id: "CONTENT_TRANSITION"
+            }
+        };
+        return db.dynamo.get(tparams).promise()
+    }
+
+    const prependItems = (page, prefix) => {
+        let prepended = page;
+        prepended.items = prepended.items.map(item => ({ ...item, label: `TRANSITION_${prefix}_${item.label}`}))
+    }
     
-    return db.dynamo.batchGet(params).promise()
-      .then( (data) => {
+    return Promise.all([db.dynamo.batchGet(params).promise(),transitionPromise()])
+      .then( ([data,transitionPage]) => {
         const docs = data.Responses[tableName]
-        const pages = docs.map(x => x.doc.pages)
+        const rawpages = docs.map(x => ({ ...x.doc.pages, journey: doc.label }))
+        const pages = rawpages.reduce((acc, cur,) => 
+            acc[acc.length -1].journey == cur.journey ? [...acc, cur] : [...acc, prependItems(transitionPage, cur.journey), cur],
+            [pages[0]]
+        )
         const fields = pages.reduce((a, b) => [...a, ...b])
         const distinct = (value, index, self) => {
             return self.findIndex(x => x.title === value.title) === index 
