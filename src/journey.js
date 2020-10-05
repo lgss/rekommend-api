@@ -46,30 +46,32 @@ exports.compile = (event) => {
             TableName: tableName,
             Key: {
                 id: "CONTENT_TRANSITION"
-            }
+            },
+            ProjectionExpression: "content"
         };
         return db.dynamo.get(tparams).promise()
     }
 
     const prependItems = (page, prefix) => {
-        let prepended = page;
-        prepended.items = prepended.items.map(item => ({ ...item, label: `TRANSITION_${prefix}_${item.label}`}))
+        return [{'title': `transition to ${prefix}`, 'items': page.Item.content.items}];
     }
-    
-    return db.dynamo.batchGet(params).promise()
-      .then( (data) => {
+    return Promise.all([db.dynamo.batchGet(params).promise(),transitionPromise()])
+    .then( ([data,transitionPage]) => {
         const journeys = data.Responses[tableName]
         journeys.forEach(journey => {
             journey.doc.pages.forEach(page => page.journey = journey.label)
         })
         const pages = journeys.map(x => x.doc.pages)
-
-        // const pages = rawpages.reduce((acc, cur,) => 
-        //     acc[acc.length -1].journey == cur.journey ? [...acc, cur] : [...acc, prependItems(transitionPage, cur.journey), cur],
-        //     [pages[0]]
-        // )
         
-        const fields = pages.reduce((a, b) => [...a, ...b])
+        const pages_trans = pages.reduce((acc, cur) => {
+            if(acc.length < 1){
+                return [...acc, cur]
+            } else {
+                return [...acc, prependItems(transitionPage, cur[0].journey), cur]
+            }
+        },[])
+        
+        const fields = pages_trans.reduce((a, b) => [...a, ...b])
         const distinct = (value, index, self) => {
             return self.findIndex(x => x.title === value.title) === index 
         }
