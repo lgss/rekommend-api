@@ -53,7 +53,7 @@ exports.compile = (event) => {
     }
 
     const prependItems = (page, prefix) => {
-        return [{'title': `transition to ${prefix}`, 'items': page.Item.content.items}];
+        return [{'title': 'Transition', 'items': page.Item.content.items}];
     }
     return Promise.all([db.dynamo.batchGet(params).promise(),transitionPromise()])
     .then( ([data,transitionPage]) => {
@@ -73,7 +73,7 @@ exports.compile = (event) => {
         
         const fields = pages_trans.reduce((a, b) => [...a, ...b])
         const distinct = (value, index, self) => {
-            return self.findIndex(x => x.title === value.title) === index 
+            return self.findIndex(x => x.title === value.title) === index || value.title == 'Transition'
         }
         const uniqueFields = fields.filter(distinct)
         return createResponse(200, JSON.stringify({"pages": uniqueFields}));
