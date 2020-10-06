@@ -36,16 +36,18 @@ exports.compile = (event) => {
             [tableName]: {
                 Keys: reqBody.journeys.map(x => {
                     return {id: x }
-                }),
-                ProjectionExpression: "doc"
+                })
             }
         }
     };
     
     return db.dynamo.batchGet(params).promise()
       .then( (data) => {
-        const docs = data.Responses[tableName]
-        const pages = docs.map(x => x.doc.pages)
+        const journeys = data.Responses[tableName]
+        journeys.forEach(journey => {
+            journey.doc.pages.forEach(page => page.journey = journey.label)
+        })
+        const pages = journeys.map(x => x.doc.pages)
         const fields = pages.reduce((a, b) => [...a, ...b])
         const distinct = (value, index, self) => {
             return self.findIndex(x => x.title === value.title) === index 
