@@ -64,6 +64,119 @@ Resources:
         AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
+  
+  GetJourneyParents:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.get
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        FindPlayerJourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journey-parent/{parentid}
+            Method: get
+        ListPlayerJourneyParents:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journey-parents
+            Method: get
+        FindJourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parent/{parentid}
+            Method: get
+        ListJourneyParents:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parents
+            Method: get
+
+  CreateJourneyParent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.create
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        JourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parent
+            Method: post
+
+  UpdateJourneyParent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.update
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        JourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parent/{parentid}
+            Method: put
+
+  DeleteJourneyParent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.delete
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        JourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parent/{parentid}
+            Method: delete
 
   CompileJourney:
     Type: AWS::Serverless::Function
