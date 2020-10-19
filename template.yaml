@@ -5,6 +5,9 @@ Parameters:
   Stage:
     Type: String
     Default: dev
+  Range:
+    Type: String
+    Default: "*"
 Resources:
   Bucket:
     Type: AWS::S3::Bucket
@@ -52,6 +55,10 @@ Resources:
     Properties:
       StageName:
         Ref: Stage
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+            - Ref: Range
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'authorization,content-type'"
