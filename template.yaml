@@ -398,7 +398,7 @@ Resources:
           TABLE_NAME:
             Ref: Table
       Events:
-        LoadTheme:
+        GetBanners:
           Type: Api
           Properties:
             RestApiId: 
