@@ -503,6 +503,29 @@ Resources:
             Path: /theme
             Method: put
                     
+  GetBanners:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadBanners
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        GetBanners:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /banners
+            Method: get
+
   GetTheme:
     Type: AWS::Serverless::Function
     Properties:
