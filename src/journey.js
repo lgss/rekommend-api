@@ -21,7 +21,8 @@ exports.create = (event, context, callback) => {
         label: reqBody.label,
         doc: reqBody.doc,
         parent: reqBody.parent,
-        type: "journey"
+        type: "journey",
+        img: reqBody.img,
     };
     return db.simple_create(event,newItem,callback);
 }
