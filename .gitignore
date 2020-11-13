@@ -113,3 +113,4 @@ package-v*
 .events
 samconfig.toml
 env.json
+.DS_Store

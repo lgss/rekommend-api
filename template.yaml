@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Simple Rekommend web service for retrieving questions and resources
+Description: SCDIP editor web service
 Parameters:
   Stage:
     Type: String
@@ -9,7 +9,7 @@ Parameters:
     Type: String
     Default: "*"
 Resources:
-  Bucket:
+  AttachmentsBucket:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: PublicRead
@@ -32,7 +32,7 @@ Resources:
           Id: rekommendCORSPutRule
           MaxAge: '3600'
   
-  Table:
+  MainTable:
     Type: AWS::Serverless::SimpleTable
     TableName:
       Fn::Join:
@@ -74,11 +74,11 @@ Resources:
       Policies:
       - DynamoDBReadPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         FindPlayerJourneyParent:
           Type: Api
@@ -118,11 +118,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         JourneyParent:
           Type: Api
@@ -141,11 +141,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         JourneyParent:
           Type: Api
@@ -164,11 +164,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         JourneyParent:
           Type: Api
@@ -187,11 +187,11 @@ Resources:
       Policies:
       - DynamoDBReadPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         CompileJourney:
           Type: Api
@@ -210,11 +210,11 @@ Resources:
       Policies:
       - DynamoDBReadPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         FindPlayerJourney:
           Type: Api
@@ -254,11 +254,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         Journey:
           Type: Api
@@ -277,11 +277,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         Journey:
           Type: Api
@@ -300,11 +300,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         Journey:
           Type: Api
@@ -323,11 +323,11 @@ Resources:
       Policies:
       - DynamoDBReadPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         FindPlayerResource:
           Type: Api
@@ -367,11 +367,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         Resource:
           Type: Api
@@ -390,11 +390,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         Resource:
           Type: Api
@@ -413,11 +413,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         Resource:
           Type: Api
@@ -436,11 +436,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         SetContent:
           Type: Api
@@ -459,11 +459,11 @@ Resources:
       Policies:
       - DynamoDBReadPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         LoadContent:
           Type: Api
@@ -489,11 +489,11 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         SetTheme:
           Type: Api
@@ -512,11 +512,11 @@ Resources:
       Policies:
       - DynamoDBReadPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         GetBanners:
           Type: Api
@@ -535,11 +535,11 @@ Resources:
       Policies:
       - DynamoDBReadPolicy:
           TableName:
-            Ref: Table
+            Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         LoadTheme:
           Type: Api
@@ -565,11 +565,11 @@ Resources:
       Policies:
       - S3WritePolicy:
           BucketName:
-            Ref: Bucket
+            Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
-            Ref: Bucket
+            Ref: AttachmentsBucket
       Events:
         SetFileURL:
           Type: Api
@@ -588,11 +588,11 @@ Resources:
       Policies:
       - S3ReadPolicy:
           BucketName:
-            Ref: Bucket
+            Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
-            Ref: Bucket
+            Ref: AttachmentsBucket
       Events:
         GetFileURL:
           Type: Api
@@ -618,11 +618,11 @@ Resources:
       Policies:
       - S3CrudPolicy:
           BucketName:
-            Ref: Bucket
+            Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
-            Ref: Bucket
+            Ref: AttachmentsBucket
       Events:
         DeleteFileURL:
           Type: Api
@@ -634,7 +634,7 @@ Resources:
 Outputs:
   BucketName:
     Description: Name of the sample Amazon S3 bucket with CORS enabled.
-    Value: !Ref 'Bucket'
+    Value: !Ref 'AttachmentsBucket'
   ApiURL:
     Description: Player API endpoint URL
     Value:
