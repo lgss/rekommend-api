@@ -1,3 +1,6 @@
-sam build --template ./editor/template.yaml
-sam build --template ./player/template.yaml
+cd editor
+sam build
+cd ../player
+sam build
+cd ..
 sam build

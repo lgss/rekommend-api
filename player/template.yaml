@@ -24,21 +24,6 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
-  RekommendEditorApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName:
-        Ref: Stage
-      Auth:
-        ResourcePolicy:
-          IpRangeWhitelist:
-            - Ref: Range
-      Cors:
-        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        AllowHeaders: "'authorization,content-type'"
-        AllowOrigin: "'*'"
-      OpenApiVersion: '2.0'
-  
   GetJourneyParents:
     Type: AWS::Serverless::Function
     Properties:
@@ -222,7 +207,7 @@ Resources:
             Method: get
 
 Outputs:
-  ApiURL:
+  ApiUrl:
     Description: Player API endpoint URL
     Value:
       Fn::Sub: https://${RekommendApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}

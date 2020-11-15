@@ -42,7 +42,7 @@ Resources:
   EditorApiAlias:
     Type: AWS::Serverless::Application
     Properties:
-      Location: /editor/template.yaml
+      Location: editor/.aws-sam/build/template.yaml
       Parameters:
         MainTable: 
           Ref: MainTable
@@ -56,7 +56,7 @@ Resources:
   PlayerApiAlias:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./player/template.yaml
+      Location: player/.aws-sam/build/template.yaml
       Parameters:
         MainTable: 
           Ref: MainTable
@@ -67,14 +67,14 @@ Resources:
         Stage:
           Ref: Stage
 Outputs:
-  BucketName:
-    Description: Name of the sample Amazon S3 bucket with CORS enabled.
+  FilesBucketName:
+    Description: Name of the Amazon S3 bucket that contains files with CORS enabled.
     Value: !Ref 'AttachmentsBucket'
   ApiURL:
     Description: Player API endpoint URL
     Value:
-      Fn::Sub: https://${PlayerApiAlias.Outputs.ApiUrl}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
+      Fn::GetAtt: [PlayerApiAlias, Outputs.ApiUrl]
   EditorApiURL:
     Description: Editor API endpoint URL
     Value:
-      Fn::Sub: https://${EditorApiAlias.Outputs.EditorApiURL}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
+      Fn::GetAtt: [EditorApiAlias, Outputs.EditorApiUrl]

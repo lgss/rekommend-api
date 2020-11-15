@@ -327,7 +327,7 @@ Resources:
             Path: /file/{filename}
             Method: delete
 Outputs:
-  EditorApiURL:
+  EditorApiUrl:
     Description: Editor API endpoint URL
     Value:
       Fn::Sub: https://${RekommendEditorApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
