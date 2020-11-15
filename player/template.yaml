@@ -1,0 +1,228 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SCDIP player web service
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  Range:
+    Type: String
+    Default: "*"
+  MainTable:
+    Type: String
+  AttachmentsBucket:
+    Type: String
+Resources:
+  RekommendApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Cors:
+        AllowMethods: "'GET'"
+        AllowHeaders: "'authorization,content-type'"
+        AllowOrigin: "'*'"
+      OpenApiVersion: '2.0'
+
+  RekommendEditorApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+            - Ref: Range
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'authorization,content-type'"
+        AllowOrigin: "'*'"
+      OpenApiVersion: '2.0'
+  
+  GetJourneyParents:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.get
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        FindJourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journey-parent/{parentid}
+            Method: get
+        ListJourneyParents:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journey-parents
+            Method: get
+
+  CompileJourney:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: journey.compile
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        CompileJourney:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journey
+            Method: post
+
+  GetJourneys:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: journey.get
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        FindJourney:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys/{journeyid}
+            Method: get
+        ListJourneys:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /journeys
+            Method: get
+
+  GetResources:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.get
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        FindResource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resource/{resourceid}
+            Method: get
+        ListResources:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /resources
+            Method: get
+                    
+  GetBanners:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadBanners
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        GetBanners:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /banners
+            Method: get
+
+  GetTheme:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadTheme
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        LoadTheme:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /theme
+            Method: get
+
+  GetFileURL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.getFileURL
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3ReadPolicy:
+          BucketName:
+            Ref: AttachmentsBucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: AttachmentsBucket
+      Events:
+        GetFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /image/{filename}
+            Method: get
+
+Outputs:
+  ApiURL:
+    Description: Player API endpoint URL
+    Value:
+      Fn::Sub: https://${RekommendApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}

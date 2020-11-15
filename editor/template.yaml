@@ -1,0 +1,333 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SCDIP editor web service
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  Range:
+    Type: String
+    Default: "*"
+  MainTable:
+    Type: String
+  AttachmentsBucket:
+    Type: String
+Resources:
+  RekommendEditorApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+            - Ref: Range
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'authorization,content-type'"
+        AllowOrigin: "'*'"
+      OpenApiVersion: '2.0'
+
+  CreateJourneyParent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.create
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        JourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parent
+            Method: post
+
+  UpdateJourneyParent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.update
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        JourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parent/{parentid}
+            Method: put
+
+  DeleteJourneyParent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.delete
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        JourneyParent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journey-parent/{parentid}
+            Method: delete
+
+  CreateJourney:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: journey.create
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Journey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journeys
+            Method: post
+
+  UpdateJourney:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: journey.update
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Journey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journeys/{journeyid}
+            Method: put
+
+  DeleteJourneys:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: journey.delete
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Journey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /journeys/{journeyid}
+            Method: delete
+
+  CreateResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.create
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources
+            Method: post
+
+  UpdateResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.update
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/{resourceid}
+            Method: put
+
+  DeleteResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.delete
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/{resourceid}
+            Method: delete
+
+  SetContent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.setContent
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        SetContent:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /content/{contentId}
+            Method: put
+
+  SetTheme:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.setTheme
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        SetTheme:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /theme
+            Method: put
+
+  SetFileURL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.setFileURL
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3WritePolicy:
+          BucketName:
+            Ref: AttachmentsBucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: AttachmentsBucket
+      Events:
+        SetFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /file/{filename}
+            Method: post
+
+  DeleteFile:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: file.deleteFile
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - S3CrudPolicy:
+          BucketName:
+            Ref: AttachmentsBucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: AttachmentsBucket
+      Events:
+        DeleteFileURL:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendEditorApi
+            Path: /file/{filename}
+            Method: delete
+Outputs:
+  EditorApiURL:
+    Description: Editor API endpoint URL
+    Value:
+      Fn::Sub: https://${RekommendEditorApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
