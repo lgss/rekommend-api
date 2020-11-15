@@ -1,6 +1,3 @@
-cd editor
-sam build
-cd ../player
-sam build
-cd ..
+(cd editor; sam build)
+(cd player; sam build)
 sam build
