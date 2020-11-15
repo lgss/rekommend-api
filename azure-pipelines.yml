@@ -25,7 +25,7 @@ steps:
     regionName: 'eu-west-2'
     awsCommand: 'cloudformation'
     awsSubCommand: 'package'
-    awsArguments: '--template-file template.yaml --output-template-file template-output.yaml --resolve-s3 --s3-prefix rekommend'
+    awsArguments: '--template-file template.yaml --output-template-file template-output.yaml --s3-bucket $(S3_BUCKET) --s3-prefix rekommend'
 
 - task: CopyFiles@2
   inputs:
