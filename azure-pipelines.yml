@@ -15,10 +15,9 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- task: Npm@1
+- task: Bash@3
   inputs:
-    command: 'install'
-    workingDir: './src'
+    filePath: './build.sh'
 
 - task: AWSCLI@1
   inputs:
