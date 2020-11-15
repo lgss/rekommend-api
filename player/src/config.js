@@ -1,27 +1,8 @@
-const db = require('./db');
+const db = require('../../db');
 const { createResponse } = require('./util');
-
-exports.setContent = (event, context, callback) => {
-  const body = JSON.parse(event.body);
-  db.simple_create(null, {
-    id: "CONTENT_" + event.pathParameters.contentId.toUpperCase(),
-    title: body.title,
-    content: body.content
-  }, callback)
-}
 
 exports.loadContent = (event, context, callback) => {
   db.get_item("CONTENT_" + event.pathParameters.contentId.toUpperCase(), callback)
-}
-
-exports.setTheme = (event, context, callback) => {
-  const body = JSON.parse(event.body);
-  db.simple_create(null, {
-    id: "THEME",
-    title: body.title,
-    primary: body.primary,
-    secondary: body.secondary
-  }, callback)
 }
 
 exports.loadTheme = (event, context, callback) => {
