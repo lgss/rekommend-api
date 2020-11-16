@@ -15,10 +15,9 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- task: Npm@1
+- task: Bash@3
   inputs:
-    command: 'install'
-    workingDir: './src'
+    filePath: './build.sh'
 
 - task: AWSCLI@1
   inputs:
@@ -26,7 +25,7 @@ steps:
     regionName: 'eu-west-2'
     awsCommand: 'cloudformation'
     awsSubCommand: 'package'
-    awsArguments: '--template-file template.yaml --s3-bucket $(S3_BUCKET) --output-template-file template-output.yaml'
+    awsArguments: '--template-file template.yaml --output-template-file template-output.yaml --s3-bucket $(S3_BUCKET) --s3-prefix rekommend'
 
 - task: CopyFiles@2
   inputs:

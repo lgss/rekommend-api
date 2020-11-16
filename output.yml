@@ -7,7 +7,7 @@ Parameters:
     Default: dev
   Range:
     Type: String
-    Default: "*"
+    Default: '*'
 Resources:
   AttachmentsBucket:
     Type: AWS::S3::Bucket
@@ -16,35 +16,43 @@ Resources:
       BucketName:
         Fn::Join:
         - ''
-        - [Ref: Stage, -rekommend]
+        - - Ref: Stage
+          - -rekommend
       CorsConfiguration:
         CorsRules:
-        - AllowedHeaders: ['*']
-          AllowedMethods: [GET]
-          AllowedOrigins: ['*']
-          ExposedHeaders: [Date]
+        - AllowedHeaders:
+          - '*'
+          AllowedMethods:
+          - GET
+          AllowedOrigins:
+          - '*'
+          ExposedHeaders:
+          - Date
           Id: rekommendCORSGetRule
           MaxAge: '3600'
-        - AllowedHeaders: ['*']
-          AllowedMethods: [PUT]
-          AllowedOrigins: ['*']
-          ExposedHeaders: [Date]
+        - AllowedHeaders:
+          - '*'
+          AllowedMethods:
+          - PUT
+          AllowedOrigins:
+          - '*'
+          ExposedHeaders:
+          - Date
           Id: rekommendCORSPutRule
           MaxAge: '3600'
-  
   MainTable:
     Type: AWS::Serverless::SimpleTable
     TableName:
       Fn::Join:
       - ''
-      - [Ref: Stage, -rekommend]
-
+      - - Ref: Stage
+        - -rekommend
   EditorApiAlias:
     Type: AWS::Serverless::Application
     Properties:
-      Location: editor/.aws-sam/build/template.yaml
+      Location: https://s3.amazonaws.com/jerichotest/c2d9a03c9459c164163877da642cc6d8.template
       Parameters:
-        MainTable: 
+        MainTable:
           Ref: MainTable
         AttachmentsBucket:
           Ref: AttachmentsBucket
@@ -52,13 +60,12 @@ Resources:
           Ref: Range
         Stage:
           Ref: Stage
-
   PlayerApiAlias:
     Type: AWS::Serverless::Application
     Properties:
-      Location: player/.aws-sam/build/template.yaml
+      Location: https://s3.amazonaws.com/jerichotest/38b95ddd837bf0341bb180519f6b3ceb.template
       Parameters:
-        MainTable: 
+        MainTable:
           Ref: MainTable
         AttachmentsBucket:
           Ref: AttachmentsBucket
@@ -67,14 +74,15 @@ Resources:
         Stage:
           Ref: Stage
 Outputs:
-  FilesBucketName:
-    Description: Name of the Amazon S3 bucket that contains files with CORS enabled.
-    Value: !Ref 'AttachmentsBucket'
+  BucketName:
+    Description: Name of the sample Amazon S3 bucket with CORS enabled.
+    Value:
+      Ref: AttachmentsBucket
   ApiURL:
     Description: Player API endpoint URL
     Value:
-      Fn::GetAtt: [PlayerApiAlias, Outputs.ApiUrl]
+      Fn::Sub: https://${PlayerApiAlias.Outputs.ApiUrl}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
   EditorApiURL:
     Description: Editor API endpoint URL
     Value:
-      Fn::GetAtt: [EditorApiAlias, Outputs.EditorApiUrl]
+      Fn::Sub: https://${EditorApiAlias.Outputs.EditorApiURL}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
