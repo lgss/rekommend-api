@@ -106,36 +106,6 @@ Resources:
               Ref: RekommendApi
             Path: /journeys
             Method: get
-
-  GetResources:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: resource.get
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        FindResource:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /resource/{resourceid}
-            Method: get
-        ListResources:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /resources
-            Method: get
                     
   GetBanners:
     Type: AWS::Serverless::Function
@@ -206,6 +176,43 @@ Resources:
             Path: /image/{filename}
             Method: get
 
+  CompileResults:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: assess.compileResults
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
+      Events:
+        SendResponses:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RekommendApi
+            Path: /responses
+            Method: post
+
+  LoadResult:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: assess.sendResults
+      Runtime: nodejs12.x
+      Policies: 
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
+      Events:
+        LoadResult:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /result/{resultId}
+            Method: get
 Outputs:
   ApiUrl:
     Description: Player API endpoint URL
