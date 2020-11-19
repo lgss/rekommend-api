@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: SCDIP player web service
 Parameters:
@@ -22,7 +22,7 @@ Resources:
         AllowMethods: "'GET'"
         AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
-      OpenApiVersion: '2.0'
+      OpenApiVersion: "2.0"
 
   GetJourneyParents:
     Type: AWS::Serverless::Function
@@ -31,9 +31,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -61,9 +61,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -84,9 +84,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -106,7 +106,7 @@ Resources:
               Ref: RekommendApi
             Path: /journeys
             Method: get
-                    
+
   GetBanners:
     Type: AWS::Serverless::Function
     Properties:
@@ -114,9 +114,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -125,7 +125,7 @@ Resources:
         GetBanners:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendApi
             Path: /banners
             Method: get
@@ -137,9 +137,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -148,7 +148,7 @@ Resources:
         LoadTheme:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendApi
             Path: /theme
             Method: get
@@ -160,9 +160,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - S3ReadPolicy:
-          BucketName:
-            Ref: AttachmentsBucket
+        - S3ReadPolicy:
+            BucketName:
+              Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
@@ -171,7 +171,7 @@ Resources:
         GetFileURL:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendApi
             Path: /image/{filename}
             Method: get
@@ -186,11 +186,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
       Events:
         SendResponses:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendApi
             Path: /responses
             Method: post
@@ -201,7 +205,7 @@ Resources:
       CodeUri: src/
       Handler: assess.sendResults
       Runtime: nodejs12.x
-      Policies: 
+      Policies:
         - DynamoDBReadPolicy:
             TableName:
               Ref: MainTable
