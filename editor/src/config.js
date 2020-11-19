@@ -1,4 +1,4 @@
-const db = require('../../db');
+const db = require('db');
 
 exports.setContent = (event, context, callback) => {
   const body = JSON.parse(event.body);

@@ -1,5 +1,5 @@
-const db = require('../../db');
-const { createResponse } = require('./util');
+const db = require('db');
+const { createResponse } = require('utils');
 
 exports.loadContent = (event, context, callback) => {
   db.get_item("CONTENT_" + event.pathParameters.contentId.toUpperCase(), callback)

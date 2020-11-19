@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 exports.dynamo = new AWS.DynamoDB.DocumentClient();
-const {createResponse} = require('./util');
+const {createResponse} = require('utils');
 
 const tableName = process.env.TABLE_NAME;
 
