@@ -80,5 +80,21 @@ exports.compileResults = (event, context, callback) => {
 }
 
 exports.sendResults = (event) => {
-  // load result from DB <- constant time
-}
+  let params = {
+    TableName: tableName,
+    Key: {
+      id: event.pathParameters.resultId
+    }
+  };
+
+  return this.dynamo.get(params).promise()
+    .then((data) => {
+      if (!data.Item) {
+        return utils.createResponse(404, `RESULTS NOT FOUND FOR ${params.Key.id}`);
+      }
+      console.log(`RETRIEVED RESULTS SUCCESSFULLY WITH data = ${data}`);
+      return utils.createResponse(200, JSON.stringify(data.Item));
+    }).catch((err) => {
+      console.log(`GET RESULTS FAILED FOR id = ${params.Key.id}, WITH ERROR: ${err}`);
+      return utils.createResponse(500, "Results not found");
+    }
