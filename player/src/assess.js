@@ -1,5 +1,5 @@
-const db = require('../../db');
-const utils = require('../../util');
+const db = require('db');
+const { createResponse } = require('utils');
 const AWS = require('aws-sdk');
 exports.dynamo = new AWS.DynamoDB.DocumentClient();
 
@@ -14,72 +14,92 @@ function getResponseTags(responses) {
   return (responses || []).flatMap(x => x.choices).flatMap(x => x.tags)
 }
 
-exports.compileResults = (event, context, callback) => {
+exports.compileResults = (event) => {
+  const httpRequest = JSON.parse(event.body)
 
-  const responses = JSON.parse(event.body).responses
+  if (httpRequest.id) {
+    let params = {
+      TableName: tableName,
+      Key: {
+        id: httpRequest.id
+      }
+    };
 
-  // strip out response tags (player)
-  let responseTags = utils.getResponseTags(responses);
+    return this.dynamo.get(params).promise()
+      .then((data) => {
+        if (!data.Item) {
+          return createResponse(404, `RESULTS NOT FOUND FOR ${httpRequest.id}`);
+        }
+        console.log(`RETRIEVED RESULTS SUCCESSFULLY WITH data = ${data}`);
 
-  // load all the resources into memory from DB (api)
-  let params = {
-    TableName: tableName,
-    FilterExpression: 'contains(#attribute , :input)',
-    ExpressionAttributeNames: { '#attribute': 'type' },
-    ExpressionAttributeValues: { ':input': 'resource' },
-  };
-  resources = []
-  this.dynamo.scan(params, (err, data) => {
-    if (err) {
-      console.error(err)
-    } else {
-      resources = data
-      data.Items.forEach(function (item) {
-        console.log(" -", item.id);
+        return createResponse(200, JSON.stringify(data.Item));
+      }).catch((err) => {
+        console.log(`GET RESULTS FAILED FOR id = ${httpRequest.id}, WITH ERROR: ${err}`);
+        return createResponse(500, "Results not found");
       });
-    }
-  })
+  } else {
+    const responses = httpRequest.responses
 
-  // match responses to resources (player)
-  let filteredResourceList = resources.filter(
-    (resource) =>
-      utils.intersects(
-        resource.doc.includeTags,
-        responseTags
-      ) &&
-      !utils.intersects(
-        resource.doc.excludeTags,
-        responseTags
-      )
-  );
 
-  // generate result Id (new)
-  let newId = uuidv4();
+    let responseTags = getResponseTags(responses);
 
-  // save responses, result, and Id back to the DB
-  params = {
-    TableName: tableName,
-    Item: {
-      "id": newId,
-      "type": "result",
-      "createdAt": new Date().toISOString(),
-      "responses": JSON.stringify(responses),
-      "resources": JSON.stringify(filteredResourceList)
-    }
+    let params = {
+      TableName: tableName,
+      FilterExpression: 'contains(#attribute , :input)',
+      ExpressionAttributeNames: { '#attribute': 'type' },
+      ExpressionAttributeValues: { ':input': 'resource' },
+    };
+    let newId = uuidv4();
+    let filteredResourceList = []
+
+    return this.dynamo.scan(params).promise()
+      .then((data) => {
+        const resources = data.Items
+
+        filteredResourceList = resources.filter(
+          (resource) =>
+            intersects(
+              resource.doc.includeTags,
+              responseTags
+            ) &&
+            !intersects(
+              resource.doc.excludeTags,
+              responseTags
+            )
+        );
+
+        //store result set in table
+        params = {
+          TableName: tableName,
+          Item: {
+            "id": newId,
+            "type": "result",
+            "createdAt": new Date().toISOString(),
+            "responses": JSON.stringify(responses),
+            "resources": JSON.stringify(filteredResourceList)
+          }
+        }
+        //console.log(JSON.stringify(params))
+        this.dynamo.put(params).promise()
+          .then((err, data) => {
+            if (err) {
+              console.error(err)
+            } else {
+              console.log("Added item " + newId)
+            }
+          })
+
+        let jsonResponse = JSON.stringify({ "id": newId, "resources": filteredResourceList })
+        let httpResponse = createResponse(201, jsonResponse)
+        console.log("response: " + JSON.stringify(httpResponse))
+
+        return httpResponse;
+      })
   }
-  this.dynamo.put(params, (err, data) => {
-    if (err) {
-      console.error(err)
-    } else {
-      console.log("Added item " + newId)
-    }
-  });
-
-  // respond with Id
-  return utils.createResponse(201, JSON.stringify(newId))
 }
 
 exports.sendResults = (event) => {
+  // load result from DB <- constant time
   let params = {
     TableName: tableName,
     Key: {
@@ -90,11 +110,12 @@ exports.sendResults = (event) => {
   return this.dynamo.get(params).promise()
     .then((data) => {
       if (!data.Item) {
-        return utils.createResponse(404, `RESULTS NOT FOUND FOR ${params.Key.id}`);
+        return createResponse(404, `RESULTS NOT FOUND FOR ${params.Key.id}`);
       }
       console.log(`RETRIEVED RESULTS SUCCESSFULLY WITH data = ${data}`);
-      return utils.createResponse(200, JSON.stringify(data.Item));
+      return createResponse(200, JSON.stringify(data.Item));
     }).catch((err) => {
       console.log(`GET RESULTS FAILED FOR id = ${params.Key.id}, WITH ERROR: ${err}`);
-      return utils.createResponse(500, "Results not found");
-    }
+      return createResponse(500, "Results not found");
+    });
+}

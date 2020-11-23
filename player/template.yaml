@@ -221,6 +221,28 @@ Resources:
               Ref: RekommendApi
             Path: /result/{resultId}
             Method: get
+  GetContent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadContent
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadContent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /content/{contentId}
+            Method: get
 Outputs:
   ApiUrl:
     Description: Player API endpoint URL
