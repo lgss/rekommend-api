@@ -2,7 +2,13 @@ const db = require('db');
 const { createResponse } = require('utils');
 
 exports.loadContent = (event, context, callback) => {
-  db.get_item("CONTENT_" + event.pathParameters.contentId.toUpperCase(), callback)
+  let id = event.pathParameters ? event.pathParameters.contentId : null;
+  if (id) {
+    db.get_item("CONTENT_" + event.pathParameters.contentId.toUpperCase(), callback)
+  } else {
+    return db.simple_scan(event, 'id', 'CONTENT_', callback);
+  }
+
 }
 
 exports.loadTheme = (event, context, callback) => {
@@ -20,7 +26,7 @@ exports.loadBanners = (event) => {
     .then(data => {
       if (data.Item)
         return createResponse(200, JSON.stringify(data.Item.banners))
-      
+
       return createResponse(404, "No banners")
     })
 

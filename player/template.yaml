@@ -243,6 +243,13 @@ Resources:
               Ref: RekommendApi
             Path: /content/{contentId}
             Method: get
+        LoadAllContent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /content
+            Method: get
 Outputs:
   ApiUrl:
     Description: Player API endpoint URL
