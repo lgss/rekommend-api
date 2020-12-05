@@ -346,14 +346,14 @@ Resources:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /resource/{resourceid}
             Method: get
         ListResources:
           Type: Api
           Properties:
             RestApiId:
-              Ref: RekommendApi
+              Ref: RekommendEditorApi
             Path: /resources
             Method: get
 Outputs:
