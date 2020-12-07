@@ -83,32 +83,3 @@ exports.simple_put = (item) => {
     })
     .catch(err => createResponse(err.statusCode, JSON.stringify(err)))
 }
-
-exports.simple_update = (event, ident, callback) => {
-    let id = ident;
-    let body = JSON.parse(event.body);
-
-    body.updates.forEach(update => {
-        let paramName = update.paramName;
-        let paramValue = update.paramValue;
-        let params = {
-            Key: {
-                id: id
-            },
-            TableName: tableName,
-            ConditionalExpression: 'attribute_exists(id)',
-            UpdateExpression: 'set ' + paramName + ' = :v',
-            ExpressionAttributeValues: {
-                ':v': paramValue
-            },
-            ReturnValue: 'ALL_NEW'
-        }
-    
-        return this.dynamo.update(params)
-            .promise()
-            .then(res => {
-                callback(null, createResponse(200, JSON.stringify(res)))
-            })
-            .catch(err => callback(null, createResponse(err.statusCode, JSON.stringify(err))))
-    });
-}
