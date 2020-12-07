@@ -1,10 +1,8 @@
 const db = require('db');
 
-exports.get = (event, context, callback) => {
-    let id = event.pathParameters ? event.pathParameters.parentid : null;
-    if(id){
-        return db.simple_get(event, event.pathParameters.parentid, callback);
-    } else {
-        return db.simple_scan(event, 'type', 'parent', callback);
-    }
+exports.get = (event) => {
+    if (event.pathParameters && event.pathParameters.parentid)
+        return db.get_item(event.pathParameters.parentid, db.sortkey.parent, true);
+
+    return db.simple_scan(db.sortField, db.sortkey.parent);
 }

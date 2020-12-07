@@ -1,20 +1,22 @@
 const db = require('db');
 
-exports.setContent = (event, context, callback) => {
+exports.setContent = (event) => {
   const body = JSON.parse(event.body);
-  db.simple_create(null, {
-    id: "CONTENT_" + event.pathParameters.contentId.toUpperCase(),
+  return db.simple_put({
+    id: event.pathParameters.contentId.toUpperCase(),
+    sort: db.sortkey.content,
     title: body.title,
     content: body.content
-  }, callback)
+  })
 }
 
-exports.setTheme = (event, context, callback) => {
+exports.setTheme = (event, callback) => {
   const body = JSON.parse(event.body);
-  db.simple_create(null, {
-    id: "THEME",
+  return db.simple_put({
+    id: 'default',
+    sort: db.sortkey.theme,
     title: body.title,
     primary: body.primary,
     secondary: body.secondary
-  }, callback)
+  })
 }

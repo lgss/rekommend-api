@@ -28,13 +28,12 @@ exports.compileResults = (event) => {
     return this.dynamo.get(params).promise()
       .then((data) => {
         if (!data.Item) {
-          return createResponse(404, `RESULTS NOT FOUND FOR ${httpRequest.id}`);
+          return createResponse(404);
         }
-        console.log(`RETRIEVED RESULTS SUCCESSFULLY WITH data = ${data}`);
 
         return createResponse(200, JSON.stringify(data.Item));
       }).catch((err) => {
-        console.log(`GET RESULTS FAILED FOR id = ${httpRequest.id}, WITH ERROR: ${err}`);
+        console.log(`compileResults get results failed for id = ${httpRequest.id}, with error: ${err}`);
         return createResponse(500, "Results not found");
       });
   } else {
@@ -45,8 +44,8 @@ exports.compileResults = (event) => {
 
     let params = {
       TableName: tableName,
-      FilterExpression: 'contains(#attribute , :input)',
-      ExpressionAttributeNames: { '#attribute': 'type' },
+      FilterExpression: 'sort = :input',
+      //ExpressionAttributeNames: { '#attribute': 'sort' },
       ExpressionAttributeValues: { ':input': 'resource' },
     };
     let newId = uuidv4();
@@ -73,7 +72,7 @@ exports.compileResults = (event) => {
           TableName: tableName,
           Item: {
             "id": newId,
-            "type": "result",
+            "sort": db.sortkey.result,
             "createdAt": new Date().toISOString(),
             "responses": JSON.stringify(responses),
             "resources": JSON.stringify(filteredResourceList)
@@ -103,19 +102,19 @@ exports.sendResults = (event) => {
   let params = {
     TableName: tableName,
     Key: {
-      id: event.pathParameters.resultId
+      id: event.pathParameters.resultId,
+      sort: db.sortkey.result
     }
   };
 
   return this.dynamo.get(params).promise()
     .then((data) => {
       if (!data.Item) {
-        return createResponse(404, `RESULTS NOT FOUND FOR ${params.Key.id}`);
+        return createResponse(404);
       }
-      console.log(`RETRIEVED RESULTS SUCCESSFULLY WITH data = ${data}`);
       return createResponse(200, JSON.stringify(data.Item));
     }).catch((err) => {
-      console.log(`GET RESULTS FAILED FOR id = ${params.Key.id}, WITH ERROR: ${err}`);
-      return createResponse(500, "Results not found");
+      console.log(`sendResults failed for id = ${params.Key.id} with error: ${err}`);
+      return createResponse(500, err);
     });
 }

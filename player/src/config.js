@@ -2,18 +2,19 @@ const db = require('db');
 const { createResponse } = require('utils');
 
 exports.loadContent = (event, context, callback) => {
-  db.get_item("CONTENT_" + event.pathParameters.contentId.toUpperCase(), callback)
+  return db.get_item(event.pathParameters.contentId.toUpperCase(), db.sortkey.content)
 }
 
 exports.loadTheme = (event, context, callback) => {
-  db.get_item("THEME", callback)
+  return db.get_item('default', db.sortkey.theme)
 }
 
 exports.loadBanners = (event) => {
   const params = {
     TableName: process.env.TABLE_NAME,
     Key: {
-      id: 'BANNERS'
+      id: 'default',
+      sort: db.sortkey.banner
     }
   }
   return db.dynamo.get(params).promise()

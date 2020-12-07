@@ -1,1 +1,9 @@
-exports.createResponse = (statusCode, body) => ({ statusCode, body, headers: {"Access-Control-Allow-Origin": "*"}})
+exports.createResponse = (statusCode, body, headers, extraHeaders) => {
+  if (!headers)
+    headers = {"Access-Control-Allow-Origin": "*"}
+  return {
+    statusCode, 
+    body,
+    headers: {...headers, ...extraHeaders}
+  }
+}

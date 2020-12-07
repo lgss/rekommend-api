@@ -28,10 +28,10 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
-  CreateJourneyParent:
+  PutJourneyParent:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: parent.create
+      Handler: parent.put
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -43,30 +43,14 @@ Resources:
           TABLE_NAME:
             Ref: MainTable
       Events:
-        JourneyParent:
+        CreateJourneyParent:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendEditorApi
             Path: /journey-parent
             Method: post
-
-  UpdateJourneyParent:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: parent.update
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        JourneyParent:
+        UpdateJourneyParent:
           Type: Api
           Properties:
             RestApiId:
@@ -97,10 +81,10 @@ Resources:
             Path: /journey-parent/{parentid}
             Method: delete
 
-  CreateJourney:
+  PutJourney:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: journey.create
+      Handler: journey.put
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -112,30 +96,14 @@ Resources:
           TABLE_NAME:
             Ref: MainTable
       Events:
-        Journey:
+        CreateJourney:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendEditorApi
             Path: /journeys
             Method: post
-
-  UpdateJourney:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: journey.update
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        Journey:
+        UpdateJourney:
           Type: Api
           Properties:
             RestApiId:
