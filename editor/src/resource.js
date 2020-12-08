@@ -1,5 +1,14 @@
-const db = require('../../db');
+const db = require('db');
 const {v4: uuidv4 } = require('uuid')
+
+exports.get = (event, context, callback) => {
+    let id = event.pathParameters ? event.pathParameters.resourceid : null;
+    if(id){
+        return db.simple_get(event, event.pathParameters.resourceid, callback);
+    } else {
+        return db.simple_scan(event, 'type', 'resource', callback);
+    }
+}
 
 exports.create = (event, context, callback) => {
     let newItem = {

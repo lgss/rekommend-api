@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: SCDIP player web service
 Parameters:
@@ -22,7 +22,7 @@ Resources:
         AllowMethods: "'GET'"
         AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
-      OpenApiVersion: '2.0'
+      OpenApiVersion: "2.0"
 
   GetJourneyParents:
     Type: AWS::Serverless::Function
@@ -31,9 +31,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -61,9 +61,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -84,9 +84,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -107,36 +107,6 @@ Resources:
             Path: /journeys
             Method: get
 
-  GetResources:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: resource.get
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        FindResource:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /resource/{resourceid}
-            Method: get
-        ListResources:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendApi
-            Path: /resources
-            Method: get
-                    
   GetBanners:
     Type: AWS::Serverless::Function
     Properties:
@@ -144,9 +114,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -155,7 +125,7 @@ Resources:
         GetBanners:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendApi
             Path: /banners
             Method: get
@@ -167,9 +137,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -178,7 +148,7 @@ Resources:
         LoadTheme:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendApi
             Path: /theme
             Method: get
@@ -190,9 +160,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - S3ReadPolicy:
-          BucketName:
-            Ref: AttachmentsBucket
+        - S3ReadPolicy:
+            BucketName:
+              Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
@@ -201,11 +171,78 @@ Resources:
         GetFileURL:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendApi
             Path: /image/{filename}
             Method: get
 
+  CompileResults:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: assess.compileResults
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        SendResponses:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /responses
+            Method: post
+
+  LoadResult:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: assess.sendResults
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        LoadResult:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /result/{resultId}
+            Method: get
+  GetContent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadContent
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: Table
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: Table
+      Events:
+        LoadContent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendApi
+            Path: /content/{contentId}
+            Method: get
 Outputs:
   ApiUrl:
     Description: Player API endpoint URL

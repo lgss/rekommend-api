@@ -3,6 +3,8 @@
     "version": "2.0.0",
     "description": "rekommend API",
     "dependencies": {
-        "uuid": "^7.0.2"
+        "uuid": "^7.0.2",
+        "db": "../../../../packages/db",
+        "utils": "../../../../packages/utils"
     }
 }

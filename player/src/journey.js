@@ -1,7 +1,7 @@
-const db = require('../../db');
+const db = require('db');
 
 const tableName = process.env.TABLE_NAME;
-const { createResponse } = require('../../util');
+const { createResponse } = require('utils');
 
 exports.get = (event, context, callback) => {
     let id = event.pathParameters ? event.pathParameters.journeyid : null;

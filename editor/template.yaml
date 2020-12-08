@@ -326,6 +326,36 @@ Resources:
               Ref: RekommendEditorApi
             Path: /file/{filename}
             Method: delete
+
+  GetResources:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.get
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        FindResource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resource/{resourceid}
+            Method: get
+        ListResources:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources
+            Method: get
 Outputs:
   EditorApiUrl:
     Description: Editor API endpoint URL

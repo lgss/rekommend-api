@@ -1,4 +1,4 @@
-const db = require('../../db');
+const db = require('db');
 
 exports.get = (event, context, callback) => {
     let id = event.pathParameters ? event.pathParameters.parentid : null;
