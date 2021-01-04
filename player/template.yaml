@@ -230,11 +230,11 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName:
-              Ref: Table
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         LoadContent:
           Type: Api
