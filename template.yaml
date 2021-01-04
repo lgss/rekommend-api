@@ -16,7 +16,7 @@ Resources:
       BucketName:
         Fn::Join:
         - ''
-        - [Ref: Stage, -rekommend]
+        - [rekommend-attachments-, Ref: Stage]
       CorsConfiguration:
         CorsRules:
         - AllowedHeaders: ['*']
