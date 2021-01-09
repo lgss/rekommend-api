@@ -9,10 +9,9 @@ exports.get = (event) => {
 }
 
 exports.put = (event) => {
-    const id = event.pathParameters.resourceid | uuidv4()
     let item = {
-        id,
-        sort: resource_sortkey,
+        id: event.pathParameters.resourceid || uuidv4(),
+        sort: db.sortkey.resource,
         modified: new Date().toISOString(),
         doc: JSON.parse(event.body)
     };

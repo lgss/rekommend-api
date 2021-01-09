@@ -1,10 +1,14 @@
 const db = require('db');
 
+exports.loadContent = (event) => {
+  return db.get_item(db.sortkey.content, 'CONTENT_' + event.pathParameters.contentId.toUpperCase())
+}
+
 exports.setContent = (event) => {
   const body = JSON.parse(event.body);
   return db.simple_put({
-    id: event.pathParameters.contentId.toUpperCase(),
-    sort: db.sortkey.content,
+    id: db.sortkey.content,
+    sort: 'CONTENT_' + event.pathParameters.contentId.toUpperCase(),
     title: body.title,
     content: body.content
   })

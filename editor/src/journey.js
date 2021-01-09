@@ -7,19 +7,9 @@ exports.delete = (event) => {
 }
 
 exports.put = (event) => {
-    const id = event.pathParameters.journeyid | uuidv4()
     let body = JSON.parse(event.body)
-    body.id = id
+    body.id = event.pathParameters.journeyid
     body.sort = db.sortkey.journey
-    
-    return db.put({
-        TableName: db.tableName,
-        Item: body
-    }).promise()
-    .then(res => {
-        if (event.pathParameters.journeyid)
-            return createResponse(204)
-        return createResponse(201, "Journey created", extraHeaders = {JourneyID: id})
-    })
-    .catch(err => createResponse(err.statusCode, JSON.stringify(err)))
+
+    return db.simple_put(body)
 }

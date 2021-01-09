@@ -28,6 +28,15 @@ Resources:
         AllowOrigin: "'*'"
       OpenApiVersion: '2.0'
 
+  # There seems to be a weird bug with SAM that means that the first function in a template
+  # doesn't properly load local dependencies. This is essentially a dummy method
+  None: 
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.put
+      Runtime: nodejs12.x
+      CodeUri: src/
+
   PutJourneyParent:
     Type: AWS::Serverless::Function
     Properties:
@@ -43,14 +52,7 @@ Resources:
           TABLE_NAME:
             Ref: MainTable
       Events:
-        CreateJourneyParent:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendEditorApi
-            Path: /journey-parent
-            Method: post
-        UpdateJourneyParent:
+        PutJourneyParent:
           Type: Api
           Properties:
             RestApiId:
@@ -134,33 +136,10 @@ Resources:
             Path: /journeys/{journeyid}
             Method: delete
 
-  CreateResource:
+  PutResource:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: resource.create
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        Resource:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendEditorApi
-            Path: /resources
-            Method: post
-
-  UpdateResource:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: resource.update
+      Handler: resource.put
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
@@ -202,6 +181,28 @@ Resources:
               Ref: RekommendEditorApi
             Path: /resources/{resourceid}
             Method: delete
+  GetContent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadContent
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        ListContent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /content/{contentId}
+            Method: get
 
   SetContent:
     Type: AWS::Serverless::Function

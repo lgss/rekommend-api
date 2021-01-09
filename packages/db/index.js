@@ -16,7 +16,7 @@ exports.sortkey = {
 
 exports.get_item = (id, sort, keepId = false) => {
     let params = {
-        TableName: tableName,
+        TableName: this.tableName,
         Key: {
             id,
             sort
@@ -39,13 +39,13 @@ exports.get_item = (id, sort, keepId = false) => {
 }
 
 exports.simple_scan = (attribute, value) => {
-
     let params = {
-        TableName: tableName,
+        TableName: this.tableName,
         FilterExpression: '#attribute = :input',
         ExpressionAttributeNames: { '#attribute': attribute },
         ExpressionAttributeValues: { ':input': value },
     };
+    console.log('scanning...')
     
     return this.dynamo.scan(params).promise()
     .then( (data) => {
@@ -58,7 +58,7 @@ exports.simple_scan = (attribute, value) => {
 
 exports.delete_item = (id, sort) => {
     let params = {
-        TableName: tableName,
+        TableName: this.tableName,
         Key: {
             id,
             sort
@@ -72,14 +72,17 @@ exports.delete_item = (id, sort) => {
 }
 
 exports.simple_put = (item) => {
-    return db.put({
-        TableName: db.tableName,
+    return this.dynamo.put({
+        TableName: this.tableName,
         Item: item
     }).promise()
     .then(res => {
+        console.log(`output: ${JSON.stringify(res)}`)
         if (item.id)
             return createResponse(204)
         return createResponse(201, "Created", extraHeaders = {CreatedId: id})
+    }, err => {
+        console.error(err)
+        return createResponse(err.statusCode, JSON.stringify(err))
     })
-    .catch(err => createResponse(err.statusCode, JSON.stringify(err)))
 }

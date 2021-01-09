@@ -1,11 +1,27 @@
 const db = require('db');
 const { createResponse } = require('utils');
 
-exports.loadContent = (event, context, callback) => {
-  return db.get_item(event.pathParameters.contentId.toUpperCase(), db.sortkey.content)
+exports.loadContent = () => {
+  var params = {
+    TableName: db.tableName,
+    KeyConditionExpression: 'id = :id',
+    ExpressionAttributeValues: {
+      ':id': db.sortkey.content
+    },
+    ProjectionExpression: 'sort, title, content'
+  };
+  
+  return db.dynamo.query(params).promise()
+    .then((data) => {
+      return createResponse(200, JSON.stringify(data.Items))
+    })
+    .catch((err) => {
+      console.error(err)
+      return createResponse(500, "An error occurred")
+    })
 }
 
-exports.loadTheme = (event, context, callback) => {
+exports.loadTheme = () => {
   return db.get_item('default', db.sortkey.theme)
 }
 
