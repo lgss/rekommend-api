@@ -16,7 +16,7 @@ Resources:
       BucketName:
         Fn::Join:
         - ''
-        - [Ref: Stage, -rekommend]
+        - [rekommend-attachments-, Ref: Stage]
       CorsConfiguration:
         CorsRules:
         - AllowedHeaders: ['*']
@@ -33,11 +33,23 @@ Resources:
           MaxAge: '3600'
   
   MainTable:
-    Type: AWS::Serverless::SimpleTable
-    TableName:
-      Fn::Join:
-      - ''
-      - [Ref: Stage, -rekommend]
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: sort
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      - AttributeName: sort
+        KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableName:
+        Fn::Join:
+        - ''
+        - [rekommend-, Ref: Stage]
 
   EditorApiAlias:
     Type: AWS::Serverless::Application

@@ -4,24 +4,20 @@ const tableName = process.env.TABLE_NAME;
 const { createResponse } = require('utils');
 
 exports.get = (event, context, callback) => {
-    let id = event.pathParameters ? event.pathParameters.journeyid : null;
-    if(id){
-        return db.simple_get(event, event.pathParameters.journeyid, callback);
-    } else {
-        return db.simple_scan(event, 'type', 'journey', callback);
-    }
+    if (event.pathParameters && event.pathParameters.journeyid)
+        return db.get_item(event.pathParameters.journeyid, db.sortkey.journey);
+
+    return db.simple_scan(db.sortField, db.sortkey.journey);
 }
 
 exports.compile = (event) => {
     const reqBody = JSON.parse(event.body);
 
-    // The current DB structure is problematic for this, as a crafted
-    // request could be used to retrieve other records
     let params = {
         RequestItems: {
             [tableName]: {
                 Keys: reqBody.journeys.map(x => {
-                    return {id: x }
+                    return {id: x, sort: db.sortkey.journey }
                 })
             }
         }
@@ -31,7 +27,8 @@ exports.compile = (event) => {
         let tparams = {
             TableName: tableName,
             Key: {
-                id: "CONTENT_TRANSITION"
+                id: "TRANSITION",
+                sort: db.sortkey.content
             },
             ProjectionExpression: "content"
         };
@@ -64,7 +61,7 @@ exports.compile = (event) => {
         const uniqueFields = fields.filter(distinct)
         return createResponse(200, JSON.stringify({"pages": uniqueFields}));
     }).catch( (err) => { 
-        console.log(`SIMPLE SCAN FAILED WITH ERROR: ${err}`);
+        console.log(`journey.compile error: ${err}`);
         return createResponse(500, JSON.stringify(err));
     });
 }

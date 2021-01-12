@@ -1,29 +1,23 @@
 const db = require('db');
 const {v4: uuidv4 } = require('uuid')
 
-exports.get = (event, context, callback) => {
-    let id = event.pathParameters ? event.pathParameters.resourceid : null;
-    if(id){
-        return db.simple_get(event, event.pathParameters.resourceid, callback);
-    } else {
-        return db.simple_scan(event, 'type', 'resource', callback);
-    }
+exports.get = (event) => {
+    if (event.pathParameters && event.pathParameters.resourceid)
+        return db.get_item(event.pathParameters.resourceid, db.sortkey.resource);
+
+    return db.simple_scan(db.sortField, db.sortkey.resource);
 }
 
-exports.create = (event, context, callback) => {
-    let newItem = {
-        id: uuidv4(),
-        createdAt: new Date().toISOString(),
-        doc: JSON.parse(event.body),
-        type: "resource"
+exports.put = (event) => {
+    let item = {
+        id: event.pathParameters.resourceid || uuidv4(),
+        sort: db.sortkey.resource,
+        modified: new Date().toISOString(),
+        doc: JSON.parse(event.body)
     };
-    return db.simple_create(event,newItem,callback);
+    return db.simple_put(item);
 }
 
-exports.delete = (event, context, callback) => {
-    return db.simple_delete(event, event.pathParameters.resourceid, callback);
-}
-
-exports.update = (event, context, callback) => {
-    return db.simple_update(event, event.pathParameters.resourceid, callback);
+exports.delete = (event) => {
+    return db.delete_item(event.pathParameters.resourceid, db.sortkey.resource);
 }

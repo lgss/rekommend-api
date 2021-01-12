@@ -23,6 +23,15 @@ Resources:
         AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
       OpenApiVersion: "2.0"
+      
+  # There seems to be a weird bug with SAM that means that the first function in a template
+  # doesn't properly load local dependencies. This is essentially a dummy method
+  None: 
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.get
+      Runtime: nodejs12.x
+      CodeUri: src/
 
   GetJourneyParents:
     Type: AWS::Serverless::Function
@@ -221,6 +230,7 @@ Resources:
               Ref: RekommendApi
             Path: /result/{resultId}
             Method: get
+
   GetContent:
     Type: AWS::Serverless::Function
     Properties:
@@ -230,18 +240,18 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName:
-              Ref: Table
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
-            Ref: Table
+            Ref: MainTable
       Events:
         LoadContent:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendApi
-            Path: /content/{contentId}
+            Path: /content
             Method: get
 Outputs:
   ApiUrl:

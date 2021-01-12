@@ -11,12 +11,10 @@ exports.getFileURL = (event, context, callback) => {
     Expires: 1800,
   }
 
-  return new Promise((resolve, reject) => {
-    let srcURL = s3.getSignedUrl('getObject', s3Params)
-    resolve({
-      "statusCode": 302,
-      "isBase64Encoded": false,
-      "headers": { "Access-Control-Allow-Origin": "*", "Location":srcURL }
-    })
+  let srcURL = s3.getSignedUrl('getObject', s3Params)
+  callback(null, {
+    "statusCode": 302,
+    "isBase64Encoded": false,
+    "headers": { "Access-Control-Allow-Origin": "*", "Location":srcURL }
   })
 }
