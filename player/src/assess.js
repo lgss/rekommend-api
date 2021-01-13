@@ -39,13 +39,11 @@ exports.compileResults = (event) => {
   } else {
     const responses = httpRequest.responses
 
-
     let responseTags = getResponseTags(responses);
 
     let params = {
       TableName: tableName,
       FilterExpression: 'sort = :input',
-      //ExpressionAttributeNames: { '#attribute': 'sort' },
       ExpressionAttributeValues: { ':input': 'resource' },
     };
     let newId = uuidv4();
@@ -78,43 +76,24 @@ exports.compileResults = (event) => {
             "resources": JSON.stringify(filteredResourceList)
           }
         }
-        //console.log(JSON.stringify(params))
-        this.dynamo.put(params).promise()
-          .then((err, data) => {
-            if (err) {
-              console.error(err)
-            } else {
-              console.log("Added item " + newId)
-            }
+        
+        return this.dynamo.put(params).promise()
+          .then(() => {
+            return createResponse(
+              201, 
+              JSON.stringify(filteredResourceList), 
+              null, 
+              {"Access-Control-Expose-Headers": "ResultsId", ResultsId: newId})
           })
-
-        let jsonResponse = JSON.stringify({ "id": newId, "resources": filteredResourceList })
-        let httpResponse = createResponse(201, jsonResponse)
-        console.log("response: " + JSON.stringify(httpResponse))
-
-        return httpResponse;
+          .catch((err) => {
+            console.error(err)
+            return createResponse(500, "An error occurred, your results could not be created")
+          })
       })
   }
 }
 
 exports.sendResults = (event) => {
   // load result from DB <- constant time
-  let params = {
-    TableName: tableName,
-    Key: {
-      id: event.pathParameters.resultId,
-      sort: db.sortkey.result
-    }
-  };
-
-  return this.dynamo.get(params).promise()
-    .then((data) => {
-      if (!data.Item) {
-        return createResponse(404);
-      }
-      return createResponse(200, JSON.stringify(data.Item));
-    }).catch((err) => {
-      console.log(`sendResults failed for id = ${params.Key.id} with error: ${err}`);
-      return createResponse(500, err);
-    });
+  return db.get_item(event.pathParameters.resultId, db.sortkey.result)
 }
