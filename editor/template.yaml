@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: SCDIP editor web service
 Parameters:
@@ -26,11 +26,11 @@ Resources:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
-      OpenApiVersion: '2.0'
+      OpenApiVersion: "2.0"
 
   # There seems to be a weird bug with SAM that means that the first function in a template
   # doesn't properly load local dependencies. This is essentially a dummy method
-  None: 
+  None:
     Type: AWS::Serverless::Function
     Properties:
       Handler: parent.put
@@ -44,9 +44,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -67,9 +67,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -90,9 +90,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -120,9 +120,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -143,9 +143,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -166,9 +166,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -181,6 +181,42 @@ Resources:
               Ref: RekommendEditorApi
             Path: /resources/{resourceid}
             Method: delete
+  CheckResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.check
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/check/{resourceid}
+            Method: get
+  CheckResourceUrl:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.check_url
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/check_url/{url}
+            Method: get
   GetContent:
     Type: AWS::Serverless::Function
     Properties:
@@ -211,9 +247,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -222,7 +258,7 @@ Resources:
         SetContent:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /content/{contentId}
             Method: put
@@ -234,9 +270,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -245,7 +281,7 @@ Resources:
         SetTheme:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /theme
             Method: put
@@ -257,9 +293,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - S3WritePolicy:
-          BucketName:
-            Ref: AttachmentsBucket
+        - S3WritePolicy:
+            BucketName:
+              Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
@@ -268,7 +304,7 @@ Resources:
         SetFileURL:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /file/{filename}
             Method: post
@@ -280,9 +316,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - S3CrudPolicy:
-          BucketName:
-            Ref: AttachmentsBucket
+        - S3CrudPolicy:
+            BucketName:
+              Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
@@ -291,7 +327,7 @@ Resources:
         DeleteFileURL:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /file/{filename}
             Method: delete
@@ -303,9 +339,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
