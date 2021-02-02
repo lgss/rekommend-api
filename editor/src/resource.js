@@ -24,25 +24,6 @@ exports.delete = (event) => {
     return db.delete_item(event.pathParameters.resourceid, db.sortkey.resource);
 }
 
-exports.check_url = async (event) => {
-    let decodeUrl = Buffer.from(event.pathParameters.url, 'base64').toString();
-    const response = await new Promise((resolve, reject) => {
-        const req = https.get(decodeUrl, function (res) {
-            resolve({
-                statusCode: 200,
-                body: JSON.stringify(res.statusCode)
-            });
-        });
-        req.on('error', (e) => {
-            reject({
-                statusCode: 500,
-                body: 'Error'
-            });
-        });
-    });
-    return response;
-}
-
 exports.check = async (event) => {
 
     const transitionPromise = () => {
@@ -65,12 +46,14 @@ exports.check = async (event) => {
             const req = https.get(urlToCheck, function (res) {
                 resolve({
                     statusCode: 200,
+                    headers: { "Access-Control-Allow-Origin": "*" },
                     body: JSON.stringify(res.statusCode)
                 });
             });
             req.on('error', (e) => {
                 reject({
                     statusCode: 500,
+                    headers: { "Access-Control-Allow-Origin": "*" },
                     body: 'Error'
                 });
             });

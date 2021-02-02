@@ -203,20 +203,6 @@ Resources:
               Ref: RekommendEditorApi
             Path: /resources/check/{resourceid}
             Method: get
-  CheckResourceUrl:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: resource.check_url
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Events:
-        Resource:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendEditorApi
-            Path: /resources/check_url/{url}
-            Method: get
   GetContent:
     Type: AWS::Serverless::Function
     Properties:
