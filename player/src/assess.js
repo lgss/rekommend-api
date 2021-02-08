@@ -28,25 +28,22 @@ exports.compileResults = (event) => {
     return this.dynamo.get(params).promise()
       .then((data) => {
         if (!data.Item) {
-          return createResponse(404, `RESULTS NOT FOUND FOR ${httpRequest.id}`);
+          return createResponse(404);
         }
-        console.log(`RETRIEVED RESULTS SUCCESSFULLY WITH data = ${data}`);
 
         return createResponse(200, JSON.stringify(data.Item));
       }).catch((err) => {
-        console.log(`GET RESULTS FAILED FOR id = ${httpRequest.id}, WITH ERROR: ${err}`);
+        console.log(`compileResults get results failed for id = ${httpRequest.id}, with error: ${err}`);
         return createResponse(500, "Results not found");
       });
   } else {
     const responses = httpRequest.responses
 
-
     let responseTags = getResponseTags(responses);
 
     let params = {
       TableName: tableName,
-      FilterExpression: 'contains(#attribute , :input)',
-      ExpressionAttributeNames: { '#attribute': 'type' },
+      FilterExpression: 'sort = :input',
       ExpressionAttributeValues: { ':input': 'resource' },
     };
     let newId = uuidv4();
@@ -73,49 +70,30 @@ exports.compileResults = (event) => {
           TableName: tableName,
           Item: {
             "id": newId,
-            "type": "result",
+            "sort": db.sortkey.result,
             "createdAt": new Date().toISOString(),
             "responses": JSON.stringify(responses),
             "resources": JSON.stringify(filteredResourceList)
           }
         }
-        //console.log(JSON.stringify(params))
-        this.dynamo.put(params).promise()
-          .then((err, data) => {
-            if (err) {
-              console.error(err)
-            } else {
-              console.log("Added item " + newId)
-            }
+        
+        return this.dynamo.put(params).promise()
+          .then(() => {
+            return createResponse(
+              201, 
+              JSON.stringify(filteredResourceList), 
+              null, 
+              {"Access-Control-Expose-Headers": "ResultsId", ResultsId: newId})
           })
-
-        let jsonResponse = JSON.stringify({ "id": newId, "resources": filteredResourceList })
-        let httpResponse = createResponse(201, jsonResponse)
-        console.log("response: " + JSON.stringify(httpResponse))
-
-        return httpResponse;
+          .catch((err) => {
+            console.error(err)
+            return createResponse(500, "An error occurred, your results could not be created")
+          })
       })
   }
 }
 
 exports.sendResults = (event) => {
   // load result from DB <- constant time
-  let params = {
-    TableName: tableName,
-    Key: {
-      id: event.pathParameters.resultId
-    }
-  };
-
-  return this.dynamo.get(params).promise()
-    .then((data) => {
-      if (!data.Item) {
-        return createResponse(404, `RESULTS NOT FOUND FOR ${params.Key.id}`);
-      }
-      console.log(`RETRIEVED RESULTS SUCCESSFULLY WITH data = ${data}`);
-      return createResponse(200, JSON.stringify(data.Item));
-    }).catch((err) => {
-      console.log(`GET RESULTS FAILED FOR id = ${params.Key.id}, WITH ERROR: ${err}`);
-      return createResponse(500, "Results not found");
-    });
+  return db.get_item(event.pathParameters.resultId, db.sortkey.result)
 }

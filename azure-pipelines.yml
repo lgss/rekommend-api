@@ -21,7 +21,7 @@ steps:
 
 - task: AWSCLI@1
   inputs:
-    awsCredentials: 'AWS-LGSS'
+    awsCredentials: 'SDLC-AWS'
     regionName: 'eu-west-2'
     awsCommand: 'cloudformation'
     awsSubCommand: 'package'

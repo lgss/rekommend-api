@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: SCDIP editor web service
 Parameters:
@@ -26,47 +26,33 @@ Resources:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'authorization,content-type'"
         AllowOrigin: "'*'"
-      OpenApiVersion: '2.0'
+      OpenApiVersion: "2.0"
 
-  CreateJourneyParent:
+  # There seems to be a weird bug with SAM that means that the first function in a template
+  # doesn't properly load local dependencies. This is essentially a dummy method
+  None:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: parent.create
+      Handler: parent.put
+      Runtime: nodejs12.x
+      CodeUri: src/
+
+  PutJourneyParent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: parent.put
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
             Ref: MainTable
       Events:
-        JourneyParent:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendEditorApi
-            Path: /journey-parent
-            Method: post
-
-  UpdateJourneyParent:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: parent.update
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        JourneyParent:
+        PutJourneyParent:
           Type: Api
           Properties:
             RestApiId:
@@ -81,9 +67,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -97,45 +83,29 @@ Resources:
             Path: /journey-parent/{parentid}
             Method: delete
 
-  CreateJourney:
+  PutJourney:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: journey.create
+      Handler: journey.put
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
             Ref: MainTable
       Events:
-        Journey:
+        CreateJourney:
           Type: Api
           Properties:
             RestApiId:
               Ref: RekommendEditorApi
             Path: /journeys
             Method: post
-
-  UpdateJourney:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: journey.update
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        Journey:
+        UpdateJourney:
           Type: Api
           Properties:
             RestApiId:
@@ -150,9 +120,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -166,39 +136,16 @@ Resources:
             Path: /journeys/{journeyid}
             Method: delete
 
-  CreateResource:
+  PutResource:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: resource.create
+      Handler: resource.put
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
-      Environment:
-        Variables:
-          TABLE_NAME:
-            Ref: MainTable
-      Events:
-        Resource:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: RekommendEditorApi
-            Path: /resources
-            Method: post
-
-  UpdateResource:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: resource.update
-      Runtime: nodejs12.x
-      CodeUri: src/
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -219,9 +166,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -234,6 +181,50 @@ Resources:
               Ref: RekommendEditorApi
             Path: /resources/{resourceid}
             Method: delete
+  CheckResource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resource.check
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        Resource:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /resources/check/{resourceid}
+            Method: get
+  GetContent:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: config.loadContent
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: MainTable
+      Events:
+        ListContent:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RekommendEditorApi
+            Path: /content/{contentId}
+            Method: get
 
   SetContent:
     Type: AWS::Serverless::Function
@@ -242,9 +233,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -253,7 +244,7 @@ Resources:
         SetContent:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /content/{contentId}
             Method: put
@@ -265,9 +256,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
@@ -276,7 +267,7 @@ Resources:
         SetTheme:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /theme
             Method: put
@@ -288,9 +279,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - S3WritePolicy:
-          BucketName:
-            Ref: AttachmentsBucket
+        - S3WritePolicy:
+            BucketName:
+              Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
@@ -299,7 +290,7 @@ Resources:
         SetFileURL:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /file/{filename}
             Method: post
@@ -311,9 +302,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - S3CrudPolicy:
-          BucketName:
-            Ref: AttachmentsBucket
+        - S3CrudPolicy:
+            BucketName:
+              Ref: AttachmentsBucket
       Environment:
         Variables:
           BUCKET_NAME:
@@ -322,7 +313,7 @@ Resources:
         DeleteFileURL:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RekommendEditorApi
             Path: /file/{filename}
             Method: delete
@@ -334,9 +325,9 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: src/
       Policies:
-      - DynamoDBReadPolicy:
-          TableName:
-            Ref: MainTable
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: MainTable
       Environment:
         Variables:
           TABLE_NAME:
